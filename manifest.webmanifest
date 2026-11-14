@@ -1,6 +1,6 @@
 {
-  "name": "Liste Devam",
-  "short_name": "Liste Devam",
+  "name": "ShortRest",
+  "short_name": "ShortRest",
   "description": "YouTube listelerine ve Shorts'a kaldığın yerden devam et",
   "lang": "tr",
   "start_url": "./",
