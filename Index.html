@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liste Devam</title>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--card2:#1f232c;--line:#2a2f3a;--tx:#e8eaf0;--mut:#8b93a5;--acc:#ff4d4d;--ok:#3ecf8e;--star:#ffc83d}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+header h1{font-size:20px;margin:0;flex:1}
+.btn{background:var(--card2);border:1px solid var(--line);padding:8px 14px;border-radius:10px}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.notice{background:#3a2a10;border:1px solid #7a5a1a;color:#ffd98a;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:14px;line-height:1.5}
+.notice code{background:#00000055;padding:1px 6px;border-radius:5px}
+.add{display:flex;gap:8px;margin-bottom:18px}
+.add input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);color:var(--tx);padding:11px 14px;border-radius:10px;font:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;position:relative;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--mut)}
+.card.def{border-color:var(--star)}
+.thumb{aspect-ratio:16/9;background:#000 center/cover no-repeat;position:relative;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:13px}
+.thumb .cnt{position:absolute;right:8px;bottom:8px;background:#000c;padding:2px 8px;border-radius:6px;font-size:12px}
+.cbody{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.cname{font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ok)}
+.meta{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;gap:8px;flex-wrap:wrap}
+.actions{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;justify-content:space-between}
+.ico{background:#000b;border:0;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.ico.on{color:var(--star)}
+.empty{color:var(--mut);text-align:center;padding:50px 10px;border:1px dashed var(--line);border-radius:14px}
+.hint{color:var(--mut);font-size:13px;margin:-8px 0 16px}
+/* player view */
+#view-player{display:none}
+.ptop{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ptop .t{flex:1;min-width:150px;font-weight:600}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px}
+.stat b{color:var(--ok)}
+.stage{background:#000;border-radius:12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto}
+.stage.v{aspect-ratio:9/16;max-height:78vh;width:auto}
+#player{width:100%;height:100%}
+#player iframe{width:100%;height:100%;border:0}
+.ctrl{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+#banner{display:none;background:#3a1a1a;border:1px solid #7a2a2a;color:#ffb0b0;padding:10px 14px;border-radius:10px;margin-bottom:10px;font-size:14px}
+.items{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto;padding-right:4px}
+.it{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer}
+.it.cur{border-color:var(--acc);background:var(--card2)}
+.it img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#000;flex:none}
+.it .n{color:var(--mut);width:28px;text-align:center;font-size:13px;flex:none}
+.it .tt{flex:1;font-size:14px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:14px;max-width:480px;width:92%}
+dialog::backdrop{background:#000a}
+dialog input[type=text],dialog input[type=password]{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--tx);padding:10px;border-radius:8px;font:inherit}
+dialog label{display:block;margin:12px 0 6px;font-size:14px;color:var(--mut)}
+dialog .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ANA EKRAN -->
+<div id="view-home">
+  <header>
+    <h1>▶ Liste Devam</h1>
+    <button class="btn" id="btnSettings">⚙ Ayarlar</button>
+  </header>
+  <div class="notice" id="fileNotice" style="display:none">
+    Bu dosyayı doğrudan çift tıklayarak (<code>file://</code>) açtınız. YouTube bu durumda videoyu çoğunlukla "Hata 153" ile reddeder.
+    Dosyayı bir adresten açın: klasörde <code>python -m http.server 8000</code> çalıştırıp <code>http://localhost:8000</code> adresine gidin, ya da GitHub Pages / Netlify gibi bir yere yükleyin.
+  </div>
+  <div class="add">
+    <input id="urlIn" type="text" placeholder="YouTube oynatma listesi URL'si (list=PL... içeren)">
+    <button class="btn pri" id="btnAdd">Ekle</button>
+  </div>
+  <div class="hint">⭐ ile işaretlediğiniz liste, sayfa her açıldığında kaldığınız yerden otomatik devam eder.</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- OYNATICI EKRANI -->
+<div id="view-player">
+  <div class="ptop">
+    <button class="btn" id="btnBack">← Listeler</button>
+    <div class="t" id="pTitle"></div>
+  </div>
+  <div class="stats">
+    <div class="stat">İzlenen: <b id="stWatched">0</b> / <span id="stTotal">?</span> video</div>
+    <div class="stat">Bu listede toplam: <b id="stTime">0 dk</b></div>
+  </div>
+  <div id="banner"></div>
+  <div class="stage" id="stage"><div id="player"></div></div>
+  <div class="ctrl">
+    <button class="btn" id="btnPrev">⏮ Önceki</button>
+    <button class="btn" id="btnNext">Sonraki ⏭</button>
+    <button class="btn" id="btnShape">↕ Dikey / Yatay (Shorts)</button>
+  </div>
+  <div class="items" id="items"></div>
+</div>
+
+</div>
+
+<dialog id="dlg">
+  <h3 style="margin:0 0 4px">Ayarlar</h3>
+  <label for="apiKey">YouTube Data API anahtarı (isteğe bağlı — video ve liste adlarını getirir)</label>
+  <input type="password" id="apiKey" placeholder="AIza...">
+  <div class="row">
+    <button class="btn" id="btnExport">Yedekle (JSON indir)</button>
+    <button class="btn" id="btnImport">Yedeği yükle</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none">
+  </div>
+  <div class="row" style="justify-content:flex-end">
+    <button class="btn" id="btnCloseDlg">Kapat</button>
+    <button class="btn pri" id="btnSaveDlg">Kaydet</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+const LS='ytListeDevam_v1';
+let S=load();
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&Array.isArray(s.lists))return s}catch(e){}return{lists:[],defaultId:null,apiKey:''}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmt(sec){sec=Math.floor(sec||0);if(sec<60)return sec+' sn';const m=Math.floor(sec/60);if(m<60)return m+' dk';const h=Math.floor(m/60);return h+' sa '+(m%60)+' dk'}
+function ago(ts){if(!ts)return 'henüz izlenmedi';const d=Math.floor((Date.now()-ts)/60000);if(d<1)return 'az önce';if(d<60)return d+' dk önce';const h=Math.floor(d/60);if(h<24)return h+' sa önce';return Math.floor(h/24)+' gün önce'}
+function parseListId(u){u=u.trim();try{const url=new URL(u);const l=url.searchParams.get('list');if(l)return l}catch(e){}
+  if(/^(PL|UU|OL|LL|FL|RD)[\w-]{10,}$/.test(u))return u;return null}
+
+if(location.protocol==='file:')$('fileNotice').style.display='block';
+
+/* ---------- ANA EKRAN ---------- */
+function renderHome(){
+  const g=$('grid');
+  if(!S.lists.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">Henüz liste yok. Yukarıya bir oynatma listesi URL\'si yapıştırın.</div>';return}
+  g.innerHTML=S.lists.map(l=>{
+    const w=Object.keys(l.watched||{}).length, t=(l.ids||[]).length;
+    const pct=t?Math.min(100,Math.round(w/t*100)):0;
+    const tid=(l.ids&&l.ids[l.index])||(l.ids&&l.ids[0]);
+    const th=tid?`style="background-image:url(https://i.ytimg.com/vi/${tid}/mqdefault.jpg)"`:'';
+    return `<div class="card ${S.defaultId===l.id?'def':''}" data-id="${l.id}">
+      <div class="thumb" ${th}>${tid?'':'Önizleme için bir kez açın'}
+        <div class="actions">
+          <button class="ico star ${S.defaultId===l.id?'on':''}" data-a="star" title="Açılışta bu liste devam etsin">${S.defaultId===l.id?'★':'☆'}</button>
+          <span style="display:flex;gap:6px">
+            <button class="ico" data-a="ren" title="Yeniden adlandır">✎</button>
+            <button class="ico" data-a="del" title="Sil">🗑</button>
+          </span>
+        </div>
+        <span class="cnt">${w} / ${t||'?'}</span>
+      </div>
+      <div class="cbody">
+        <div class="cname">${esc(l.name)}</div>
+        <div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="meta"><span>⏱ ${fmt(l.watchSec)}</span><span>${t?('Video '+((l.index||0)+1)+'. sırada'):''}</span></div>
+        <div class="meta"><span>${ago(l.lastAt)}</span></div>
+      </div></div>`}).join('');
+}
+$('grid').addEventListener('click',e=>{
+  const card=e.target.closest('.card');if(!card)return;
+  const id=card.dataset.id;const a=e.target.closest('[data-a]');
+  if(a){e.stopPropagation();
+    if(a.dataset.a==='star'){S.defaultId=S.defaultId===id?null:id;save();renderHome()}
+    else if(a.dataset.a==='ren'){const l=S.lists.find(x=>x.id===id);const n=prompt('Liste adı:',l.name);if(n&&n.trim()){l.name=n.trim();l.customName=true;save();renderHome()}}
+    else if(a.dataset.a==='del'){if(confirm('Bu liste ve izleme geçmişi silinsin mi?')){S.lists=S.lists.filter(x=>x.id!==id);if(S.defaultId===id)S.defaultId=null;save();renderHome()}}
+    return}
+  openList(id);
+});
+$('btnAdd').onclick=addList;
+$('urlIn').addEventListener('keydown',e=>{if(e.key==='Enter')addList()});
+function addList(){
+  const lid=parseListId($('urlIn').value);
+  if(!lid){alert('Geçerli bir oynatma listesi bulunamadı. URL içinde list=... olmalı.');return}
+  if(S.lists.some(l=>l.listId===lid)){alert('Bu liste zaten ekli.');return}
+  const l={id:'l'+Date.now().toString(36),listId:lid,name:'Liste '+(S.lists.length+1),index:0,time:0,ids:[],titles:{},watched:{},watchSec:0,lastAt:0,vertical:false};
+  S.lists.push(l);if(!S.defaultId)S.defaultId=l.id;save();$('urlIn').value='';renderHome();
+  fetchMeta(l).then(renderHome);
+}
+
+/* ---------- API ANAHTARI İLE ADLAR (isteğe bağlı) ---------- */
+async function fetchMeta(l){
+  if(!S.apiKey)return;
+  try{
+    const k=encodeURIComponent(S.apiKey);
+    const r=await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${l.listId}&key=${k}`);
+    const j=await r.json();
+    if(j.items&&j.items[0]&&!l.customName)l.name=j.items[0].snippet.title;
+    let tok='';
+    do{
+      const r2=await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${l.listId}&key=${k}${tok?'&pageToken='+tok:''}`);
+      const j2=await r2.json();
+      (j2.items||[]).forEach(it=>{const v=it.snippet.resourceId&&it.snippet.resourceId.videoId;if(v)l.titles[v]=it.snippet.title});
+      tok=j2.nextPageToken||'';
+    }while(tok);
+    save();
+  }catch(e){}
+}
+
+/* ---------- OYNATICI ---------- */
+let YTready=false,player=null,playerReady=false,cur=null,loadedOk=false,tick=0,pending=null;
+const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+window.onYouTubeIframeAPIReady=function(){YTready=true;if(pending){const p=pending;pending=null;startPlayback(p)}};
+
+function showView(v){$('view-home').style.display=v==='home'?'block':'none';$('view-player').style.display=v==='player'?'block':'none'}
+
+function openList(id){
+  cur=S.lists.find(l=>l.id===id);if(!cur)return;
+  showView('player');
+  $('pTitle').textContent=cur.name;
+  $('banner').style.display='none';
+  applyShape();renderStats();renderItems();
+  loadedOk=false;
+  if(!YTready){pending=cur;return}
+  startPlayback(cur);
+}
+function startPlayback(l){
+  const opts={listType:'playlist',list:l.listId,index:l.index||0,startSeconds:Math.floor(l.time||0)};
+  if(!player){
+    const pv={playsinline:1,rel:0};
+    if(location.protocol.startsWith('http'))pv.origin=location.origin;
+    player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
+      onReady:()=>{playerReady=true;player.loadPlaylist(opts)},
+      onStateChange:onState,
+      onError:onErr}});
+  }else if(playerReady){player.loadPlaylist(opts)}
+}
+function onErr(e){
+  const m={2:'Geçersiz parametre.',5:'Oynatıcı hatası.',100:'Video bulunamadı veya silinmiş.',101:'Video gömülü oynatmaya izin vermiyor.',150:'Video gömülü oynatmaya izin vermiyor.',153:'Hata 153: sayfa bir web adresinden (http/https) açılmalı, dosyadan değil.'}[e.data]||('Hata '+e.data);
+  const b=$('banner');b.style.display='block';b.textContent=m+(e.data===101||e.data===150||e.data===100?' Sonraki videoya geçiliyor…':'');
+  if([100,101,150].includes(e.data))setTimeout(()=>{try{player.nextVideo()}catch(x){}},1500);
+}
+function onState(e){
+  if(!cur)return;
+  const s=e.data;
+  if(s===1){loadedOk=true;$('banner').style.display='none';syncIds();recordVideo()}
+  if(s===0){markCurrent(true);saveProgress(true)}
+  if(s===2)saveProgress();
+}
+function syncIds(){
+  try{const ids=player.getPlaylist();
+    if(ids&&ids.length&&(ids.length!==cur.ids.length||ids[0]!==cur.ids[0])){cur.ids=ids.slice();save();renderItems();renderStats()}}catch(e){}
+}
+function recordVideo(){
+  try{const d=player.getVideoData();if(d&&d.video_id&&d.title&&cur.titles[d.video_id]!==d.title){cur.titles[d.video_id]=d.title;save();renderItems()}}catch(e){}
+  highlight();
+}
+function curVid(){try{const d=player.getVideoData();return d&&d.video_id}catch(e){return null}}
+function markCurrent(v){const id=curVid();if(!id)return;if(v)cur.watched[id]=1;else delete cur.watched[id];save();renderStats();renderItems()}
+function saveProgress(ended){
+  if(!cur||!playerReady||!loadedOk)return;
+  try{
+    const idx=player.getPlaylistIndex();if(idx<0)return;
+    cur.index=idx;cur.time=ended?0:player.getCurrentTime();cur.lastAt=Date.now();save();
+  }catch(e){}
+}
+setInterval(()=>{
+  if(!cur||$('view-player').style.display==='none'||!playerReady)return;
+  let st;try{st=player.getPlayerState()}catch(e){return}
+  if(st===1){
+    cur.watchSec=(cur.watchSec||0)+1;tick++;
+    try{const d=player.getDuration(),t=player.getCurrentTime();
+      if(d>0&&t/d>=0.9){const id=curVid();if(id&&!cur.watched[id]){cur.watched[id]=1;renderItems()}}}catch(e){}
+    if(tick%5===0){saveProgress()}
+    renderStats(true);
+  }
+},1000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProgress()});
+window.addEventListener('pagehide',()=>{saveProgress();save()});
+
+function renderStats(light){
+  if(!cur)return;
+  const ids=new Set(cur.ids||[]);
+  let w=Object.keys(cur.watched).length;
+  $('stWatched').textContent=w;
+  $('stTotal').textContent=cur.ids.length||'?';
+  $('stTime').textContent=fmt(cur.watchSec);
+}
+function renderItems(){
+  if(!cur)return;
+  const box=$('items');
+  if(!cur.ids.length){box.innerHTML='<div class="empty">Video listesi oynatıcı yüklenince burada görünecek.</div>';return}
+  box.innerHTML=cur.ids.map((id,i)=>`<div class="it" data-i="${i}" data-v="${id}">
+    <span class="n">${i+1}</span>
+    <img loading="lazy" src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt="">
+    <span class="tt">${esc(cur.titles[id]||('Video '+(i+1)))}</span>
+    <button class="chk ${cur.watched[id]?'on':''}" data-c="1" title="İzlendi işaretini değiştir">✓</button></div>`).join('');
+  highlight();
+}
+function highlight(){
+  if(!cur)return;
+  const idx=(function(){try{return player.getPlaylistIndex()}catch(e){return cur.index}})();
+  document.querySelectorAll('#items .it').forEach(el=>el.classList.toggle('cur',+el.dataset.i===idx));
+  const c=document.querySelector('#items .it.cur');
+  if(c){const b=$('items');const off=c.offsetTop-b.offsetTop-60;if(Math.abs(b.scrollTop-off)>200)b.scrollTop=off}
+  const id=cur.ids[idx];if(id&&cur.titles[id])$('pTitle').textContent=cur.name+' — '+cur.titles[id];
+}
+$('items').addEventListener('click',e=>{
+  const it=e.target.closest('.it');if(!it||!cur)return;
+  const i=+it.dataset.i,v=it.dataset.v;
+  if(e.target.closest('[data-c]')){if(cur.watched[v])delete cur.watched[v];else cur.watched[v]=1;save();renderStats();renderItems();return}
+  loadedOk=false;player.playVideoAt(i);
+});
+$('btnPrev').onclick=()=>{if(playerReady)player.previousVideo()};
+$('btnNext').onclick=()=>{if(playerReady){markCurrent(true);player.nextVideo()}};
+$('btnShape').onclick=()=>{cur.vertical=!cur.vertical;save();applyShape()};
+function applyShape(){$('stage').classList.toggle('v',!!cur.vertical)}
+$('btnBack').onclick=()=>{
+  saveProgress();
+  try{player.pauseVideo()}catch(e){}
+  cur=null;showView('home');renderHome();
+};
+
+/* ---------- AYARLAR / YEDEK ---------- */
+$('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';$('dlg').showModal()};
+$('btnCloseDlg').onclick=()=>$('dlg').close();
+$('btnSaveDlg').onclick=()=>{S.apiKey=$('apiKey').value.trim();save();$('dlg').close();
+  S.lists.forEach(l=>fetchMeta(l).then(renderHome))};
+$('btnExport').onclick=()=>{
+  const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='liste-devam-yedek-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('btnImport').onclick=()=>$('fileImport').click();
+$('fileImport').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);
+    if(!j||!Array.isArray(j.lists))throw 0;
+    if(confirm('Mevcut veriler yedekle değiştirilsin mi?')){S=j;save();renderHome();$('dlg').close()}}
+    catch(x){alert('Geçersiz yedek dosyası.')}};r.readAsText(f);e.target.value=''};
+
+/* ---------- BAŞLANGIÇ ---------- */
+renderHome();
+if(S.defaultId&&S.lists.some(l=>l.id===S.defaultId))openList(S.defaultId);
+})();
+</script>
+</body>
+</html>
