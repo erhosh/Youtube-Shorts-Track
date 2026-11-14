@@ -78,6 +78,15 @@ body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
 .it .tt{flex:1;font-size:14px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
 .chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
+#dayPop{position:absolute;top:10px;left:50%;transform:translate(-50%,-14px);background:var(--ok);color:#06220f;font-weight:700;font-size:15px;line-height:1.2;padding:8px 16px;border-radius:14px;z-index:8;pointer-events:none;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 4px 14px #0007;max-width:92%}
+#dayPop.show{opacity:1;transform:translate(-50%,0)}
+.seekrow{display:flex;align-items:center;gap:6px;margin:10px 0 0}
+.seekrow .tm{font-size:13px;color:var(--mut);min-width:42px;text-align:center;font-variant-numeric:tabular-nums}
+.seekrow input[type=range]{flex:1;min-width:0;height:36px;margin:0;accent-color:var(--ok);touch-action:pan-y}
+.seekrow .btn{padding:0;width:46px;height:40px;font-size:13px;flex:none}
+body.clean .seekrow{display:none!important}
+.cstats .w2{grid-column:1/-1}
+.cstats .td b{color:var(--star)}
 /* bottom sheet */
 #sheetBk{position:fixed;inset:0;background:#000a;opacity:0;pointer-events:none;transition:opacity .2s;z-index:1000}
 #sheetBk.show{opacity:1;pointer-events:auto}
@@ -138,7 +147,14 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div></div>
+  <div class="seekrow">
+    <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
+    <span class="tm" id="tCur">0:00</span>
+    <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Videoyu ileri geri sar">
+    <span class="tm" id="tDur">0:00</span>
+    <button class="btn" id="btnSeekF" title="10 sn ileri">10 ⏩</button>
+  </div>
   <div id="banner"></div>
   <div class="ctrl">
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
@@ -338,6 +354,7 @@ function renderHome(){
     const w=wcount(l),t=l.ids.length;
     const pct=t?Math.min(100,Math.round(w/t*100)):0;
     const tid=l.vid||l.ids[0];
+    const td=peekDay(l);
     const th=tid?`style="background-image:url(https://i.ytimg.com/vi/${tid}/mqdefault.jpg)"`:'';
     return `<div class="card ${S.defaultId===l.id?'def':''}" data-id="${l.id}">
       <div class="thumb" ${th}>${tid?'':'Önizleme için bir kez açın'}
@@ -356,7 +373,9 @@ function renderHome(){
         <div class="cstats">
           <div><span>İzlenen</span><b>${w} / ${t||'?'} video</b></div>
           <div><span>Sıra</span><b>${t?((l.index||0)+1)+' / '+t:'-'}</b></div>
-          <div><span>Toplam izlenme süresi</span><b>⏱ ${fmt(l.watchSec)}</b></div>
+          <div class="w2"><span>Toplam izlenme süresi</span><b>⏱ ${fmt(l.watchSec)}</b></div>
+          <div class="td"><span>Bugün izlenen</span><b>${td.n} video</b></div>
+          <div class="td"><span>Bugün süre</span><b>⏱ ${fmt(td.sec)}</b></div>
         </div>
         <div class="meta"><span>${ago(l.lastAt)}</span></div>
       </div></div>`}).join('');
@@ -463,14 +482,14 @@ function begin(l){
   if(i<0)i=Math.min(l.index||0,l.ids.length-1);
   l.index=i;l.vid=l.ids[i];save();
   renderItems();
-  loadedOk=false;lastLoad=Date.now();
+  countedLoad=false;loadedOk=false;lastLoad=Date.now();
   try{player.loadVideoById({videoId:l.vid,startSeconds:Math.floor(l.time||0)})}catch(e){}
   if(l.fs&&!isFs())setTimeout(()=>{if(cur===l&&l.fs&&!isFs())toggleFs()},0);
 }
 function playIndex(i){
   if(!cur||!playerReady||i<0||i>=cur.ids.length)return false;
   cur.index=i;cur.vid=cur.ids[i];cur.time=0;cur.lastAt=Date.now();save();
-  loadedOk=false;lastLoad=Date.now();updateSwipe();
+  countedLoad=false;loadedOk=false;lastLoad=Date.now();updateSwipe();
   try{player.loadVideoById({videoId:cur.vid})}catch(e){}
   highlight();
   return true;
@@ -490,7 +509,7 @@ function onState(e){
     if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
   }
   else if(s===0){
-    markWatched(cur.vid,true);saveProgress(true);
+    markWatched(cur.vid,true);countWatch();saveProgress(true);
     if(!playIndex(cur.index+1)){cur.time=0;save()}
   }
   else if(s===2)saveProgress();
@@ -518,8 +537,9 @@ setInterval(()=>{
   if(!cur||$('view-player').style.display==='none'||!playerReady)return;
   let st;try{st=player.getPlayerState()}catch(e){return}
   if(st===1){
-    cur.watchSec=(cur.watchSec||0)+1;tick++;
+    cur.watchSec=(cur.watchSec||0)+1;dayOf(cur).sec++;tick++;
     try{const d=player.getDuration(),t=player.getCurrentTime();
+      if(d>0&&t/d>=0.9)countWatch();
       if(d>0&&t/d>=0.9&&cur.vid&&!cur.watched[cur.vid]){cur.watched[cur.vid]=1;setRowWatched(cur.vid);save()}}catch(e){}
     if(tick%5===0){saveProgress();save()}
   }
@@ -618,16 +638,39 @@ function togglePlay(){
     else{player.playVideo();toast('▶')}
   }catch(e){}
 }
-let g=null;
+let g=null,lastTap=0,tapT=null;
 gest.addEventListener('pointerdown',e=>{
-  g={x:e.clientX,y:e.clientY,t:Date.now()};
+  g={x:e.clientX,y:e.clientY,t:Date.now(),mode:null};
   try{gest.setPointerCapture(e.pointerId)}catch(x){}
+});
+// Yatay sürükleme: videoyu ileri/geri sar (parmak bırakılınca uygulanır)
+gest.addEventListener('pointermove',e=>{
+  if(!g)return;
+  const dx=e.clientX-g.x,dy=e.clientY-g.y;
+  if(!g.mode&&Math.abs(dx)>14&&Math.abs(dx)>Math.abs(dy)*1.3){
+    g.mode='h';
+    try{g.t0=player.getCurrentTime();g.d=player.getDuration()}catch(x){g.t0=0;g.d=0}
+  }
+  if(g.mode==='h'){
+    const span=Math.min(g.d||60,90);
+    let tg=g.t0+dx/(stage.clientWidth||300)*span;
+    tg=Math.max(0,g.d>0?Math.min(tg,g.d-0.3):tg);
+    g.tg=tg;
+    toast((tg>=g.t0?'⏩ ':'⏪ ')+fmtT(tg)+' / '+fmtT(g.d));
+  }
 });
 gest.addEventListener('pointerup',e=>{
   if(!g)return;
-  const dx=e.clientX-g.x,dy=e.clientY-g.y,dt=Date.now()-g.t;g=null;
+  const dx=e.clientX-g.x,dy=e.clientY-g.y,dt=Date.now()-g.t,mode=g.mode,tg=g.tg;g=null;
+  if(mode==='h'){try{player.seekTo(tg,true)}catch(x){}return}
   if(stage.classList.contains('swipe')&&Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx)*1.2)go(dy<0?1:-1);
-  else if(Math.abs(dx)<12&&Math.abs(dy)<12&&dt<500)togglePlay();
+  else if(Math.abs(dx)<12&&Math.abs(dy)<12&&dt<500){
+    // tek dokunuş: duraklat/oynat · kenarlara çift dokunuş: 10 sn geri/ileri
+    const now=Date.now(),r=stage.getBoundingClientRect(),rx=(e.clientX-r.left)/(r.width||1);
+    clearTimeout(tapT);
+    if(now-lastTap<300&&(rx<0.35||rx>0.65)){lastTap=0;seekBy(rx<0.5?-10:10)}
+    else{lastTap=now;tapT=setTimeout(togglePlay,280)}
+  }
 });
 gest.addEventListener('pointercancel',()=>{g=null});
 let wheelLock=0;
@@ -676,6 +719,59 @@ function toggleFs(){
 document.addEventListener('fullscreenchange',updFs);
 document.addEventListener('webkitfullscreenchange',updFs);
 $('btnFs').onclick=toggleFs;
+
+/* ---------- İLERİ / GERİ SARMA ---------- */
+let seeking=false;
+function fmtT(s){s=Math.max(0,Math.floor(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')}
+function seekBy(delta){
+  if(!playerReady)return;
+  try{
+    const t=player.getCurrentTime(),d=player.getDuration();
+    const n=Math.max(0,d>0?Math.min(t+delta,d-0.3):t+delta);
+    player.seekTo(n,true);
+    toast((delta>0?'⏩ +':'⏪ −')+Math.abs(Math.round(delta))+' sn');
+  }catch(e){}
+}
+const seekEl=$('seek'),tCur=$('tCur'),tDur=$('tDur');
+$('btnSeekB').onclick=()=>seekBy(-10);
+$('btnSeekF').onclick=()=>seekBy(10);
+seekEl.addEventListener('input',()=>{
+  seeking=true;
+  try{tCur.textContent=fmtT(seekEl.value/1000*player.getDuration())}catch(e){}
+});
+function endSeek(){
+  if(!seeking)return;
+  try{const d=player.getDuration();if(d>0)player.seekTo(seekEl.value/1000*d,true)}catch(e){}
+  seeking=false;
+}
+['change','pointerup','touchend','keyup'].forEach(ev=>seekEl.addEventListener(ev,endSeek));
+setInterval(()=>{
+  if(seeking||!cur||!playerReady||document.hidden||$('view-player').style.display==='none')return;
+  try{
+    const d=player.getDuration(),t=player.getCurrentTime();
+    if(d>0){seekEl.value=Math.round(t/d*1000);tCur.textContent=fmtT(t);tDur.textContent=fmtT(d)}
+    else{seekEl.value=0;tCur.textContent='0:00';tDur.textContent='0:00'}
+  }catch(e){}
+},300);
+
+/* ---------- GÜNLÜK SAYAÇ ---------- */
+let countedLoad=false,popT;
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dayOf(l){const k=todayKey();if(!l.day||l.day.d!==k)l.day={d:k,n:0,sec:0};return l.day}
+function peekDay(l){const k=todayKey();return(l.day&&l.day.d===k)?l.day:{n:0,sec:0}}
+function todayTotal(){let n=0;for(const l of S.lists)n+=peekDay(l).n;return n}
+function showDayPop(n){
+  const p=$('dayPop');p.textContent='Bugün '+n+' video izlediniz';
+  p.classList.add('show');clearTimeout(popT);popT=setTimeout(()=>p.classList.remove('show'),3500);
+}
+// Bir video bitince ya da %90'ına gelince bir kez sayılır; her 5. videoda bilgi kutusu çıkar
+function countWatch(){
+  if(countedLoad||!cur)return;
+  countedLoad=true;
+  dayOf(cur).n++;save();
+  const n=todayTotal();
+  if(n%5===0)showDayPop(n);
+}
 
 /* ---------- ALTYAZI (CC) ---------- */
 function updateCCUI(){
