@@ -16,6 +16,7 @@
 html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overscroll-behavior-y:contain}
 button{font:inherit;color:inherit;cursor:pointer}
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
+body.pl .wrap{padding-top:env(safe-area-inset-top,0px)}
 header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 header h1{font-size:20px;margin:0;flex:1}
 .btn{background:var(--card2);border:1px solid var(--line);padding:8px 14px;border-radius:10px}
@@ -38,6 +39,12 @@ header h1{font-size:20px;margin:0;flex:1}
 .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .bar>i{display:block;height:100%;background:var(--ok)}
 .meta{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;gap:8px;flex-wrap:wrap}
+.meta b{color:var(--tx);font-weight:600}
+.cstats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cstats>div{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cstats span{color:var(--mut);font-size:11px}
+.cstats b{color:var(--ok);font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cstats b.lk{color:var(--star)}
 .actions{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;justify-content:space-between}
 .ico{background:#000b;border:0;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:17px}
 .ico.on{color:var(--star)}
@@ -45,12 +52,7 @@ header h1{font-size:20px;margin:0;flex:1}
 .hint{color:var(--mut);font-size:13px;margin:0 0 16px;line-height:1.5}
 /* player view */
 #view-player{display:none}
-.ptop{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.ptop .t{flex:1;min-width:150px;font-weight:600}
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px}
-.stat b{color:var(--ok)}
-.stage{position:relative;background:#000;border-radius:12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto}
+.stage{position:relative;background:#000;border-radius:0 0 12px 12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto}
 .stage.v{aspect-ratio:9/16;width:min(100%,calc(78vh * 9 / 16))}
 .stage:fullscreen,.stage.fs{width:100vw!important;height:100vh!important;max-height:none!important;aspect-ratio:auto!important;border-radius:0}
 .stage.fs{position:fixed;inset:0;z-index:999}
@@ -58,12 +60,17 @@ header h1{font-size:20px;margin:0;flex:1}
 #gesture{position:absolute;left:0;right:0;top:0;bottom:48px;z-index:5;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .stage.swipe #gesture{touch-action:none}
 .stage:fullscreen #gesture,.stage.fs #gesture{bottom:56px}
-#fsBtn{position:absolute;top:8px;right:8px;z-index:6;width:40px;height:40px;border:0;border-radius:10px;background:#000a;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
 #toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#000b;color:#fff;padding:10px 18px;border-radius:12px;font-size:18px;z-index:7;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
 #toast.show{opacity:1}
-.swhint{color:var(--mut);font-size:13px;margin:0 0 10px}
-.ctrl{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
-#banner{display:none;background:#3a1a1a;border:1px solid #7a2a2a;color:#ffb0b0;padding:10px 14px;border-radius:10px;margin-bottom:10px;font-size:14px;line-height:1.4}
+#cleanExit{display:none;position:absolute;top:8px;right:8px;z-index:6;width:36px;height:36px;border:0;border-radius:50%;background:#0008;color:#fff;font-size:16px;align-items:center;justify-content:center;opacity:.55}
+body.clean #cleanExit{display:flex}
+body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
+.ctrl{display:flex;gap:10px;margin:12px 0}
+.ctrl .btn{flex:1;height:48px;padding:0 10px;font-size:19px;display:flex;align-items:center;justify-content:center;gap:6px}
+.ctrl .cc{font-size:13px;font-weight:700;border:2px solid currentColor;border-radius:5px;padding:0 5px;line-height:18px;letter-spacing:.5px}
+#btnCC.on{background:var(--ok);border-color:var(--ok);color:#06220f}
+#btnLike.on{background:var(--star);border-color:var(--star);color:#2a1d00}
+#banner{display:none;background:#3a1a1a;border:1px solid #7a2a2a;color:#ffb0b0;padding:10px 14px;border-radius:10px;margin:10px 0;font-size:14px;line-height:1.4}
 #banner.info{background:#13283a;border-color:#2a5a7a;color:#a9d4ff}
 .items{position:relative;display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto;padding-right:4px}
 .it{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 62px}
@@ -73,12 +80,37 @@ header h1{font-size:20px;margin:0;flex:1}
 .it .tt{flex:1;font-size:14px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
 .chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
-dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:14px;max-width:480px;width:92%}
+/* bottom sheet */
+#sheetBk{position:fixed;inset:0;background:#000a;opacity:0;pointer-events:none;transition:opacity .2s;z-index:1000}
+#sheetBk.show{opacity:1;pointer-events:auto}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;background:#212121;border-radius:18px 18px 0 0;z-index:1001;transform:translateY(105%);transition:transform .25s ease;max-height:85vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+#sheet.open{transform:none}
+#sheetHead{padding:12px 0 8px;touch-action:none;flex:none}
+#sheetHead i{display:block;width:44px;height:4px;border-radius:2px;background:#8b8b8b;margin:0 auto}
+#sheetBody{overflow:auto;overscroll-behavior:contain;padding:4px 10px 14px}
+.srow{display:flex;align-items:center;gap:20px;width:100%;background:none;border:0;padding:16px 12px;font-size:18px;text-align:left;border-radius:10px;color:#f1f1f1}
+.srow:active{background:#ffffff14}
+.srow svg{width:26px;height:26px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.srow .lbl{flex:1}
+.srow .val{color:#aaa;font-size:15px}
+#sheetDesc{display:none;padding:0 8px}
+#sheetDesc .dh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+#sheetDesc .dh button{background:none;border:0;font-size:22px;width:40px;height:40px;border-radius:50%}
+#sheetDesc .dh span{font-weight:600;font-size:17px}
+#descTitle{font-size:17px;font-weight:600;line-height:1.35;margin:0 0 4px}
+#descCh{color:#aaa;font-size:14px;margin:0 0 12px}
+#descTxt{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:#ddd}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:14px;max-width:480px;width:92%;max-height:90vh;overflow:auto}
 dialog::backdrop{background:#000a}
 dialog input[type=text],dialog input[type=password]{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--tx);padding:10px;border-radius:8px;font:inherit}
 dialog label{display:block;margin:12px 0 6px;font-size:14px;color:var(--mut);line-height:1.4}
 dialog .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 dialog p{font-size:13px;color:var(--mut);line-height:1.5;margin:10px 0 0}
+dialog .sep{border-top:1px solid var(--line);margin-top:18px;padding-top:4px}
+dialog .sep h4{margin:12px 0 2px;font-size:15px}
+.notice.info{background:#13283a;border-color:#2a5a7a;color:#a9d4ff}
+#syncCodeShow{font-size:26px;font-weight:700;letter-spacing:4px;color:var(--ok)}
+#syncStatus{min-height:18px}
 </style>
 </head>
 <body>
@@ -94,6 +126,7 @@ dialog p{font-size:13px;color:var(--mut);line-height:1.5;margin:10px 0 0}
   <div class="notice" id="fileNotice" style="display:none">
     Bu sayfa <code>file://</code> veya <code>content://</code> ile açıldı. YouTube bu durumda videoyu "Hata 153" ile reddeder. Sayfayı bir web adresinden (https://…) açın.
   </div>
+  <div class="notice info" id="syncNote" style="display:none"></div>
   <div class="add">
     <input id="urlIn" type="text" placeholder="Liste, Shorts videosu veya kanal linki">
     <button class="btn pri" id="btnAdd">Ekle</button>
@@ -107,39 +140,75 @@ dialog p{font-size:13px;color:var(--mut);line-height:1.5;margin:10px 0 0}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="ptop">
-    <button class="btn" id="btnBack">← Listeler</button>
-    <div class="t" id="pTitle"></div>
-  </div>
-  <div class="stats">
-    <div class="stat">İzlenen: <b id="stWatched">0</b> / <span id="stTotal">?</span> video</div>
-    <div class="stat">Sıra: <b id="stPos">-</b></div>
-    <div class="stat">Bu listede toplam: <b id="stTime">0 dk</b></div>
-  </div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div></div>
   <div id="banner"></div>
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="fsBtn" title="Tam ekran">⛶</button><div id="toast"></div></div>
   <div class="ctrl">
-    <button class="btn" id="btnPrev">⏮ Önceki</button>
-    <button class="btn" id="btnNext">Sonraki ⏭</button>
-    <button class="btn" id="btnFs">⛶ Tam ekran</button>
-    <button class="btn" id="btnShape">↕ Dikey / Yatay</button>
-    <button class="btn" id="btnRefresh">↻ Listeyi yenile</button>
+    <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
+    <button class="btn" id="btnLike" title="Beğen">👍</button>
+    <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
   </div>
-  <div class="swhint">Video oynarken (veya tam ekranda) videonun üzerinde yukarı kaydır: sonraki · aşağı kaydır: önceki. Duraklatılmışken sayfa kayar. Dokun: duraklat/oynat</div>
   <div class="items" id="items"></div>
 </div>
 
+</div>
+
+<!-- ALT MENÜ (BOTTOM SHEET) -->
+<div id="sheetBk"></div>
+<div id="sheet" role="dialog" aria-modal="true">
+  <div id="sheetHead"><i></i></div>
+  <div id="sheetBody">
+    <div id="sheetMain">
+      <button class="srow" data-s="desc"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg><span class="lbl">Açıklama</span></button>
+      <button class="srow" data-s="clean"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M4 4l6 6M20 15v5h-5M20 20l-6-6"/></svg><span class="lbl">Ekranı temizle</span></button>
+      <button class="srow" data-s="cc"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10.5 10.2a2 2 0 1 0 0 3.6M17 10.2a2 2 0 1 0 0 3.6"/></svg><span class="lbl">Altyazılar</span><span class="val" id="valCC"></span></button>
+      <button class="srow" data-s="shape"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5M20 4v4h-4M20 12a8 8 0 0 1-14 5M4 20v-4h4"/></svg><span class="lbl">Dikey / Yatay görünüm</span><span class="val" id="valShape"></span></button>
+      <button class="srow" data-s="fs"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Tam ekran</span></button>
+      <button class="srow" data-s="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg><span class="lbl">Listeyi yenile</span></button>
+      <button class="srow" data-s="yt"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span class="lbl">YouTube'da aç</span></button>
+    </div>
+    <div id="sheetDesc">
+      <div class="dh"><button id="descBack" aria-label="Geri">←</button><span>Açıklama</span></div>
+      <h3 id="descTitle"></h3>
+      <p id="descCh"></p>
+      <div id="descTxt"></div>
+    </div>
+  </div>
 </div>
 
 <dialog id="dlg">
   <h3 style="margin:0 0 4px">Ayarlar</h3>
   <label for="apiKey">YouTube Data API anahtarı</label>
   <input type="password" id="apiKey" placeholder="AIza...">
-  <p>Anahtar; 200'den uzun listelerin tamamını almak, Shorts/kanal linkleri ve video başlıklarını getirmek için gerekir. Anahtarsız yalnızca ilk 200 videoya kadar çalışır.</p>
+  <p>Anahtar; 200'den uzun listelerin tamamını almak, Shorts/kanal linkleri, video başlıkları ve açıklamaları getirmek için gerekir. Anahtarsız yalnızca ilk 200 videoya kadar çalışır.</p>
   <div class="row">
     <button class="btn" id="btnExport">Yedekle (JSON indir)</button>
     <button class="btn" id="btnImport">Yedeği yükle</button>
     <input type="file" id="fileImport" accept=".json" style="display:none">
+  </div>
+  <div class="sep">
+    <h4>Cihazlar Arası Senkronizasyon (Firebase)</h4>
+    <div id="syncOff">
+      <div class="row"><button class="btn pri" id="btnSyncCreate">Yeni kod oluştur</button></div>
+      <label for="syncCodeIn">veya başka cihazdaki 6 karakterli kodu girin</label>
+      <div class="row" style="margin-top:0">
+        <input type="text" id="syncCodeIn" maxlength="6" placeholder="ABC234" autocapitalize="characters" autocomplete="off" style="flex:1;min-width:0">
+        <button class="btn" id="btnSyncConnect">Bağlan</button>
+      </div>
+    </div>
+    <div id="syncOn" style="display:none">
+      <label>Eşleşme kodu</label>
+      <div id="syncCodeShow"></div>
+      <div class="row">
+        <button class="btn" id="btnSyncPush">⬆ Buluta yükle</button>
+        <button class="btn" id="btnSyncPull">⬇ Buluttan indir</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSyncAuto">Otomatik senkron: Kapalı</button>
+        <button class="btn" id="btnSyncDisc">Bağlantıyı kes</button>
+      </div>
+    </div>
+    <p id="syncStatus"></p>
+    <p>Listeler, ilerleme, beğeniler ve altyazı tercihi eşitlenir. YouTube API anahtarı cihazda kalır, buluta gönderilmez.</p>
   </div>
   <div class="row" style="justify-content:flex-end">
     <button class="btn" id="btnCloseDlg">Kapat</button>
@@ -151,17 +220,29 @@ dialog p{font-size:13px;color:var(--mut);line-height:1.5;margin:10px 0 0}
 (function(){
 const LS='ytListeDevam_v1';
 let S=load();
+const LSS='shortrestSync_v1';
+let SY=loadSync();
+function loadSync(){
+  let s=null;try{s=JSON.parse(localStorage.getItem(LSS))}catch(e){}
+  s=(s&&typeof s==='object')?s:{};
+  if(!s.dev)s.dev='d'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+  s.code=s.code||'';s.auto=!!s.auto;s.lastAt=s.lastAt||0;s.dirty=!!s.dirty;
+  try{localStorage.setItem(LSS,JSON.stringify(s))}catch(e){}
+  return s;
+}
+function saveSync(){try{localStorage.setItem(LSS,JSON.stringify(SY))}catch(e){}}
 function migrate(s){
   if(!s||!Array.isArray(s.lists))s={lists:[],defaultId:null,apiKey:''};
+  s.ccOn=!!s.ccOn;
   s.lists.forEach(l=>{
-    l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};
+    l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};l.liked=l.liked||{};
     l.kind=l.kind||'playlist';l.index=l.index||0;l.time=l.time||0;l.watchSec=l.watchSec||0;
     if(!l.vid&&l.ids[l.index])l.vid=l.ids[l.index];
   });
   return s;
 }
 function load(){let s=null;try{s=JSON.parse(localStorage.getItem(LS))}catch(e){}return migrate(s)}
-function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}onLocalChange()}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmt(sec){sec=Math.floor(sec||0);if(sec<60)return sec+' sn';const m=Math.floor(sec/60);if(m<60)return m+' dk';const h=Math.floor(m/60);return h+' sa '+(m%60)+' dk'}
@@ -208,7 +289,7 @@ async function refreshIds(l){
   if(l.index>=l.ids.length)l.index=l.ids.length-1;
   if(!l.vid)l.vid=l.ids[l.index];
   save();
-  if(cur===l){renderItems();renderStats();highlight()}
+  if(cur===l){renderItems();highlight()}
 }
 
 /* ---------- GİRİŞ ÇÖZÜMLEME ---------- */
@@ -254,6 +335,7 @@ function renderHome(){
     const pct=t?Math.min(100,Math.round(w/t*100)):0;
     const tid=l.vid||l.ids[0];
     const th=tid?`style="background-image:url(https://i.ytimg.com/vi/${tid}/mqdefault.jpg)"`:'';
+    const likes=Object.keys(l.liked||{}).length;
     return `<div class="card ${S.defaultId===l.id?'def':''}" data-id="${l.id}">
       <div class="thumb" ${th}>${tid?'':'Önizleme için bir kez açın'}
         <div class="actions">
@@ -263,12 +345,17 @@ function renderHome(){
             <button class="ico" data-a="del" title="Sil">🗑</button>
           </span>
         </div>
-        <span class="cnt">${w} / ${t||'?'}</span>
+        <span class="cnt">${pct}%</span>
       </div>
       <div class="cbody">
         <div class="cname">${l.kind==='shorts'?'<span class="tag">SHORTS</span>':''}${esc(l.name)}</div>
         <div class="bar"><i style="width:${pct}%"></i></div>
-        <div class="meta"><span>⏱ ${fmt(l.watchSec)}</span><span>${t?('Video '+((l.index||0)+1)+'. sırada'):''}</span></div>
+        <div class="cstats">
+          <div><span>İzlenen</span><b>${w} / ${t||'?'} video</b></div>
+          <div><span>Sıra</span><b>${t?((l.index||0)+1)+' / '+t:'-'}</b></div>
+          <div><span>Toplam izlenme süresi</span><b>⏱ ${fmt(l.watchSec)}</b></div>
+          <div><span>Beğenilen</span><b class="lk">👍 ${likes}</b></div>
+        </div>
         <div class="meta"><span>${ago(l.lastAt)}</span></div>
       </div></div>`}).join('');
 }
@@ -291,7 +378,7 @@ async function addList(){
     const r=await resolveInput(txt);
     if(!r){alert('Bu link tanınmadı. Oynatma listesi (list=…), Shorts/video veya kanal (@isim) linki girin.');return}
     if(S.lists.some(l=>l.listId===r.listId)){alert('Bu liste zaten ekli.');return}
-    const l={id:'l'+Date.now().toString(36),kind:r.kind,listId:r.listId,name:r.name||('Liste '+(S.lists.length+1)),index:0,time:0,vid:null,ids:[],titles:{},watched:{},watchSec:0,lastAt:0,fetchedAt:0,vertical:r.kind==='shorts',startVid:r.startVid||null};
+    const l={id:'l'+Date.now().toString(36),kind:r.kind,listId:r.listId,name:r.name||('Liste '+(S.lists.length+1)),index:0,time:0,vid:null,ids:[],titles:{},watched:{},liked:{},watchSec:0,lastAt:0,fetchedAt:0,vertical:r.kind==='shorts',startVid:r.startVid||null};
     S.lists.push(l);if(!S.defaultId)S.defaultId=l.id;save();$('urlIn').value='';renderHome();
     if(S.apiKey){
       try{await refreshIds(l)}catch(e){alert('Liste bilgileri alınamadı: '+e.message)}
@@ -302,11 +389,16 @@ async function addList(){
 }
 
 /* ---------- OYNATICI ---------- */
-let YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0;
+let YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0;
 window.onYouTubeIframeAPIReady=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
 const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
 
-function showView(v){$('view-home').style.display=v==='home'?'block':'none';$('view-player').style.display=v==='player'?'block':'none'}
+function showView(v){
+  $('view-home').style.display=v==='home'?'block':'none';
+  $('view-player').style.display=v==='player'?'block':'none';
+  document.body.classList.toggle('pl',v==='player');
+  if(v==='player')window.scrollTo(0,0);
+}
 function showBanner(t,info){const b=$('banner');b.textContent=t;b.className=info?'info':'';b.style.display='block'}
 function hideBanner(){$('banner').style.display='none'}
 
@@ -314,7 +406,7 @@ function ensurePlayer(){
   if(playerP)return playerP;
   playerP=new Promise(res=>{
     const mk=()=>{
-      const pv={playsinline:1,rel:0,fs:0};
+      const pv={playsinline:1,rel:0,fs:0,cc_load_policy:S.ccOn?1:0};
       if(location.protocol.indexOf('http')===0)pv.origin=location.origin;
       player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
         onReady:()=>{playerReady=true;res()},
@@ -347,8 +439,9 @@ async function ensureIds(l){
 }
 async function openList(id){
   const l=S.lists.find(x=>x.id===id);if(!l)return;
-  cur=l;lastHi=-1;
-  showView('player');$('pTitle').textContent=l.name;hideBanner();applyShape();renderStats();renderItems();
+  if(!cur){try{history.pushState({view:'player',listId:id},'')}catch(e){}}
+  cur=l;lastHi=-1;ccFor=null;
+  showView('player');hideBanner();applyShape();renderItems();updateLike();updateCCUI();
   try{await ensurePlayer()}catch(e){return}
   if(cur!==l)return;
   if(!l.ids.length){
@@ -367,7 +460,7 @@ function begin(l){
   let i=l.vid?l.ids.indexOf(l.vid):-1;
   if(i<0)i=Math.min(l.index||0,l.ids.length-1);
   l.index=i;l.vid=l.ids[i];save();
-  renderItems();renderStats();
+  renderItems();updateLike();
   loadedOk=false;lastLoad=Date.now();
   try{player.loadVideoById({videoId:l.vid,startSeconds:Math.floor(l.time||0)})}catch(e){}
 }
@@ -376,7 +469,7 @@ function playIndex(i){
   cur.index=i;cur.vid=cur.ids[i];cur.time=0;cur.lastAt=Date.now();save();
   loadedOk=false;lastLoad=Date.now();updateSwipe();
   try{player.loadVideoById({videoId:cur.vid})}catch(e){}
-  highlight();renderStats();
+  highlight();
   return true;
 }
 function onErr(e){
@@ -389,7 +482,10 @@ function onState(e){
   updateSwipe();
   if(!cur)return;
   const s=e.data;
-  if(s===1){loadedOk=true;hideBanner();recordVideo()}
+  if(s===1){
+    loadedOk=true;hideBanner();recordVideo();
+    if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
+  }
   else if(s===0){
     markWatched(cur.vid,true);saveProgress(true);
     if(!playIndex(cur.index+1)){cur.time=0;save()}
@@ -405,7 +501,7 @@ function recordVideo(){
 function markWatched(id,v){
   if(!cur||!id)return;
   if(v)cur.watched[id]=1;else delete cur.watched[id];
-  save();renderStats();setRowWatched(id);
+  save();setRowWatched(id);
 }
 function saveProgress(ended){
   if(!cur||!playerReady||!loadedOk)return;
@@ -423,19 +519,11 @@ setInterval(()=>{
     try{const d=player.getDuration(),t=player.getCurrentTime();
       if(d>0&&t/d>=0.9&&cur.vid&&!cur.watched[cur.vid]){cur.watched[cur.vid]=1;setRowWatched(cur.vid);save()}}catch(e){}
     if(tick%5===0){saveProgress();save()}
-    renderStats();
   }
 },1000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProgress()});
-window.addEventListener('pagehide',()=>{saveProgress();save()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){saveProgress();flushPush()}});
+window.addEventListener('pagehide',()=>{saveProgress();save();flushPush()});
 
-function renderStats(){
-  if(!cur)return;
-  $('stWatched').textContent=wcount(cur);
-  $('stTotal').textContent=cur.ids.length||'?';
-  $('stPos').textContent=cur.ids.length?((cur.index+1)+' / '+cur.ids.length):'-';
-  $('stTime').textContent=fmt(cur.watchSec);
-}
 function renderItems(){
   if(!cur)return;
   const box=$('items');lastHi=-1;
@@ -467,8 +555,7 @@ function highlight(forceScroll){
     const b=$('items');const off=r.offsetTop-60;
     if(forceScroll||Math.abs(b.scrollTop-off)>200)b.scrollTop=off;
   }
-  const t=cur.titles[cur.vid];
-  $('pTitle').textContent=cur.name+(t?' — '+t:'');
+  updateLike();
 }
 $('items').addEventListener('click',e=>{
   const it=e.target.closest('.it');if(!it||!cur)return;
@@ -476,29 +563,44 @@ $('items').addEventListener('click',e=>{
   if(e.target.closest('[data-c]')){markWatched(v,!cur.watched[v]);return}
   playIndex(i);
 });
-$('btnPrev').onclick=()=>go(-1);
-$('btnNext').onclick=()=>go(1);
-$('btnShape').onclick=()=>{cur.vertical=!cur.vertical;save();applyShape()};
-$('btnRefresh').onclick=async()=>{
-  if(!cur)return;
-  if(!S.apiKey){alert("Listeyi yenilemek için Ayarlar'dan API anahtarı girin.");return}
-  const b=$('btnRefresh');b.disabled=true;
-  try{await refreshIds(cur);showBanner('Liste güncellendi: '+cur.ids.length+' video.',true);setTimeout(hideBanner,2500)}
-  catch(e){showBanner('API: '+e.message)}
-  b.disabled=false;
-};
 function applyShape(){$('stage').classList.toggle('v',!!(cur&&cur.vertical))}
-$('btnBack').onclick=()=>{
-  saveProgress();
+async function doRefresh(){
+  if(!cur)return;
+  if(!S.apiKey){showBanner("Listeyi yenilemek için Ayarlar'dan API anahtarı girin (ana ekran → ⚙ Ayarlar).");return}
+  try{showBanner('Liste yenileniyor…',true);await refreshIds(cur);showBanner('Liste güncellendi: '+cur.ids.length+' video.',true);setTimeout(hideBanner,2500)}
+  catch(e){showBanner('API: '+e.message)}
+}
+
+/* ---------- ANA EKRANA DÖNÜŞ (History API) ---------- */
+function goHome(){
+  if(!cur)return;
+  saveProgress();save();
   try{player.pauseVideo()}catch(e){}
-  if(isFs())toggleFs();
-  cur=null;showView('home');renderHome();
-};
+  closeSheet();setClean(false);
+  if(isFs())exitFs();
+  cur=null;showView('home');
+  if(pendingRemote){const v=pendingRemote;pendingRemote=null;onRemote(v)}
+  else flushPush();
+  renderHome();
+}
+window.addEventListener('popstate',()=>{
+  if(!cur)return;
+  // Açık bir katman (menü, temiz mod, tam ekran) varsa geri tuşu önce onu kapatır
+  const consumed=sheetOpen||cleanMode||isFs()||(Date.now()-fsExitAt<500);
+  if(consumed){
+    if(sheetOpen)closeSheet();
+    else if(cleanMode)setClean(false);
+    else if(isFs())exitFs();
+    try{history.pushState({view:'player',listId:cur.id},'')}catch(e){}
+    return;
+  }
+  goHome();
+});
 
 /* ---------- KAYDIRMA + TAM EKRAN ---------- */
 const stage=$('stage'),gest=$('gesture'),toastEl=$('toast');
 let toastT;
-function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),700)}
+function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
 function go(dir){
   if(!cur)return;
   const ok=playIndex(cur.index+dir);
@@ -541,12 +643,20 @@ function updateSwipe(){
   const on=isFs()||st===1||st===3||(Date.now()-lastLoad<1500);
   stage.classList.toggle('swipe',on);
 }
-function updFs(){$('fsBtn').textContent=isFs()?'✕':'⛶';if(!isFs()){try{screen.orientation.unlock()}catch(e){}}updateSwipe()}
+let wasFs=false;
+function updFs(){
+  const now=isFs();
+  if(wasFs&&!now)fsExitAt=Date.now();
+  wasFs=now;
+  if(!now){try{screen.orientation.unlock()}catch(e){}}
+  updateSwipe();
+}
+function exitFs(){
+  if(nativeFs()){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}}
+  stage.classList.remove('fs');updFs();
+}
 function toggleFs(){
-  if(isFs()){
-    if(nativeFs()){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}}
-    stage.classList.remove('fs');updFs();return;
-  }
+  if(isFs()){exitFs();return}
   const f=stage.requestFullscreen||stage.webkitRequestFullscreen;
   const fallback=()=>{stage.classList.add('fs');updFs()};
   if(f){
@@ -559,11 +669,155 @@ function toggleFs(){
 }
 document.addEventListener('fullscreenchange',updFs);
 document.addEventListener('webkitfullscreenchange',updFs);
-$('fsBtn').onclick=toggleFs;
-$('btnFs').onclick=toggleFs;
+
+/* ---------- ALTYAZI (CC) ---------- */
+function updateCCUI(){
+  $('btnCC').classList.toggle('on',!!S.ccOn);
+  $('valCC').textContent=S.ccOn?'Açık':'Kapalı';
+}
+function applyCC(userAction){
+  if(!playerReady)return;
+  try{
+    if(S.ccOn){
+      player.loadModule('captions');
+      setTimeout(()=>{
+        try{
+          const tl=player.getOption('captions','tracklist');
+          if(tl&&tl.length){
+            const t=player.getOption('captions','track');
+            if(!t||!t.languageCode)player.setOption('captions','track',{languageCode:tl[0].languageCode});
+          }else if(userAction)toast('Bu videoda altyazı bulunamadı');
+        }catch(e){}
+      },700);
+    }else{
+      player.unloadModule('captions');
+    }
+  }catch(e){}
+}
+function toggleCC(){
+  S.ccOn=!S.ccOn;save();updateCCUI();
+  ccFor=cur?cur.vid:null;
+  applyCC(true);
+  toast(S.ccOn?'Altyazı: açık':'Altyazı: kapalı');
+}
+$('btnCC').onclick=toggleCC;
+
+/* ---------- BEĞENİ ---------- */
+function updateLike(){
+  const on=!!(cur&&cur.liked&&cur.vid&&cur.liked[cur.vid]);
+  const b=$('btnLike');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
+}
+$('btnLike').onclick=()=>{
+  if(!cur||!cur.vid)return;
+  cur.liked=cur.liked||{};
+  if(cur.liked[cur.vid]){delete cur.liked[cur.vid];toast('Beğeni kaldırıldı')}
+  else{cur.liked[cur.vid]=1;toast('👍 Beğenildi')}
+  save();updateLike();
+};
+
+/* ---------- TEMİZ MOD ---------- */
+function setClean(on){
+  cleanMode=!!on;
+  document.body.classList.toggle('clean',cleanMode);
+  if(cleanMode)window.scrollTo(0,0);
+}
+$('cleanExit').onclick=()=>setClean(false);
+
+/* ---------- ALT MENÜ (BOTTOM SHEET) ---------- */
+const sheet=$('sheet'),sbody=$('sheetBody');
+function updateSheetVals(){
+  $('valCC').textContent=S.ccOn?'Açık':'Kapalı';
+  $('valShape').textContent=cur&&cur.vertical?'Dikey (9:16)':'Yatay (16:9)';
+}
+function showSheetMain(){$('sheetDesc').style.display='none';$('sheetMain').style.display='block';sbody.scrollTop=0}
+function openSheet(){
+  if(!cur)return;
+  showSheetMain();updateSheetVals();
+  $('sheetBk').classList.add('show');sheet.classList.add('open');
+  sheetOpen=true;
+}
+function closeSheet(){
+  if(!sheetOpen)return;
+  sheetOpen=false;
+  $('sheetBk').classList.remove('show');sheet.classList.remove('open');
+  sheet.style.transition='';sheet.style.transform='';
+}
+$('btnMore').onclick=openSheet;
+$('sheetBk').onclick=closeSheet;
+
+// aşağı çekerek kapatma
+let dr=null;
+sheet.addEventListener('touchstart',e=>{
+  const head=!!e.target.closest('#sheetHead');
+  if(!head&&sbody.scrollTop>0){dr=null;return}
+  dr={y:e.touches[0].clientY,dy:0,head};
+},{passive:true});
+sheet.addEventListener('touchmove',e=>{
+  if(!dr)return;
+  if(!dr.head&&sbody.scrollTop>0)return;
+  const dy=e.touches[0].clientY-dr.y;
+  if(dy>0){
+    dr.dy=dy;sheet.style.transition='none';sheet.style.transform='translateY('+dy+'px)';
+    if(e.cancelable)e.preventDefault();
+  }
+},{passive:false});
+sheet.addEventListener('touchend',()=>{
+  if(!dr)return;
+  const dy=dr.dy;dr=null;
+  sheet.style.transition='';
+  if(dy>90)closeSheet();else sheet.style.transform='';
+});
+
+// Açıklama paneli
+const descCache={};
+async function showDesc(){
+  if(!cur)return;
+  $('sheetMain').style.display='none';$('sheetDesc').style.display='block';sbody.scrollTop=0;
+  const vid=cur.vid;
+  let title=cur.titles[vid]||'',ch='';
+  try{const d=player.getVideoData();if(d&&d.video_id===vid){title=d.title||title;ch=d.author||''}}catch(e){}
+  const paint=(t,c,d)=>{
+    $('descTitle').textContent=t||'(Başlık yok)';
+    $('descCh').textContent=c?('Kanal: '+c):'';
+    $('descTxt').textContent=d;
+  };
+  if(!S.apiKey){paint(title,ch,"Açıklamayı görmek için ana ekrandaki ⚙ Ayarlar bölümüne YouTube API anahtarı girin.");return}
+  if(descCache[vid]){const c=descCache[vid];paint(c.title||title,c.channel||ch,c.desc||'(Açıklama yok)');return}
+  paint(title,ch,'Yükleniyor…');
+  try{
+    const j=await api('videos',{part:'snippet',id:vid});
+    const it=j.items&&j.items[0];
+    if(!it)throw new Error('Video bilgisi alınamadı.');
+    descCache[vid]={title:it.snippet.title,channel:it.snippet.channelTitle,desc:it.snippet.description};
+    if(sheetOpen&&cur&&cur.vid===vid&&$('sheetDesc').style.display==='block'){
+      const c=descCache[vid];paint(c.title||title,c.channel||ch,c.desc||'(Açıklama yok)');
+    }
+  }catch(e){
+    if(cur&&cur.vid===vid)paint(title,ch,'Açıklama alınamadı: '+e.message);
+  }
+}
+$('descBack').onclick=showSheetMain;
+
+$('sheetMain').addEventListener('click',e=>{
+  const r=e.target.closest('[data-s]');if(!r||!cur)return;
+  const a=r.dataset.s;
+  if(a==='desc'){showDesc();return}
+  if(a==='cc'){toggleCC();updateSheetVals();return}
+  closeSheet();
+  if(a==='clean'){setClean(true)}
+  else if(a==='shape'){cur.vertical=!cur.vertical;save();applyShape()}
+  else if(a==='fs'){toggleFs()}
+  else if(a==='refresh'){doRefresh()}
+  else if(a==='yt'){
+    const id=cur.vid;if(!id)return;
+    const url=cur.kind==='shorts'?'https://www.youtube.com/shorts/'+id:'https://www.youtube.com/watch?v='+id;
+    try{player.pauseVideo()}catch(x){}
+    window.open(url,'_blank','noopener');
+  }
+});
 
 /* ---------- AYARLAR / YEDEK ---------- */
-$('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';$('dlg').showModal()};
+$('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';refreshSyncUI();$('dlg').showModal()};
 $('btnCloseDlg').onclick=()=>$('dlg').close();
 $('btnSaveDlg').onclick=()=>{S.apiKey=$('apiKey').value.trim();save();$('dlg').close()};
 $('btnExport').onclick=()=>{
@@ -592,8 +846,210 @@ if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){
 }
 
 /* ---------- BAŞLANGIÇ ---------- */
-renderHome();
-if(S.defaultId&&S.lists.some(l=>l.id===S.defaultId))openList(S.defaultId);
+/* ---------- FIREBASE SENKRONİZASYON ---------- */
+// >>> Firebase konsolundan (Proje ayarları → Web uygulaması) aldığınız yapılandırmayı buraya yazın.
+// SyncPod / Edinim Takip'te kullandığınız aynı proje (tracker-49c34) yapılandırmasını kopyalayabilirsiniz.
+const FB_CONFIG={
+  apiKey:"BURAYA_API_KEY",
+  authDomain:"tracker-49c34.firebaseapp.com",
+  databaseURL:"https://tracker-49c34-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"tracker-49c34",
+  appId:"BURAYA_APP_ID"
+};
+const SYNC_ROOT='shortrest_sync'; // tracker: sync/, syncpod: syncpod_sync/ — çakışmaz
+let fbP=null,fbListening=null,pushTimer=null,pushing=false,applying=false,pendingRemote=null,noteT;
+
+function fmtDate(ts){try{return new Date(ts).toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'})}catch(e){return String(ts)}}
+function setSyncStatus(t){const el=$('syncStatus');if(el)el.textContent=t||''}
+function homeNote(t){const n=$('syncNote');n.textContent=t;n.style.display='block';clearTimeout(noteT);noteT=setTimeout(()=>{n.style.display='none'},4500)}
+function withTimeout(p,ms,msg){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg||'Zaman aşımı (internet yok mu?)')),ms))])}
+function errMsg(e){
+  const m=String((e&&e.message)||e||'');const c=(e&&e.code)||'';
+  if(/PERMISSION_DENIED/i.test(m))return 'Erişim reddedildi: Firebase → Realtime Database → Rules ayarlarını ve Anonymous girişi kontrol edin.';
+  if(/operation-not-allowed|admin-restricted/i.test(c+m))return 'Anonim giriş kapalı: Firebase → Authentication → Sign-in method → Anonymous seçeneğini açın.';
+  return 'Hata: '+m;
+}
+function genCode(){
+  const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
+  const r=new Uint32Array(6);crypto.getRandomValues(r);
+  for(let i=0;i<6;i++)s+=A[r[i]%A.length];
+  return s;
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('yüklenemedi: '+src));document.head.appendChild(s)})}
+async function loadFirebaseSdk(){
+  const bases=[['https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-','.min.js'],['https://www.gstatic.com/firebasejs/9.23.0/firebase-','.js']];
+  for(const f of ['app','auth','database']){
+    if(window.firebase&&((f==='app')||(f==='auth'&&firebase.auth)||(f==='database'&&firebase.database)))continue;
+    let ok=false;
+    for(const b of bases){try{await loadScript(b[0]+f+'-compat'+b[1]);ok=true;break}catch(e){}}
+    if(!ok)throw new Error('Firebase betikleri yüklenemedi (internet veya reklam engelleyici?).');
+  }
+}
+function fbReady(){
+  if(fbP)return fbP;
+  fbP=(async()=>{
+    if(String(FB_CONFIG.apiKey).indexOf('BURAYA')===0)throw new Error('Firebase ayarları girilmemiş: index.html içindeki FB_CONFIG alanını doldurun.');
+    await loadFirebaseSdk();
+    if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);
+    const auth=firebase.auth();
+    const u=await new Promise(r=>{const off=auth.onAuthStateChanged(x=>{off();r(x)})});
+    if(!u)await auth.signInAnonymously();
+  })();
+  fbP.catch(()=>{fbP=null});
+  return fbP;
+}
+async function cloudGet(code){
+  const snap=await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+code).once('value'),12000);
+  return snap.val();
+}
+function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId,ccOn:S.ccOn})}
+async function doPush(){
+  pushing=true;
+  try{
+    const ts=Date.now();
+    await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+SY.code).set({data:payload(),updatedAt:ts,device:SY.dev}),15000);
+    SY.lastAt=ts;SY.dirty=false;saveSync();
+    return ts;
+  }finally{pushing=false}
+}
+function applyRemote(v){
+  let inc;try{inc=JSON.parse(v.data)}catch(e){setSyncStatus('Bulut verisi okunamadı.');return false}
+  if(!inc||!Array.isArray(inc.lists)){setSyncStatus('Bulut verisi geçersiz.');return false}
+  applying=true;
+  try{
+    const key=S.apiKey;
+    S=migrate(inc);S.apiKey=key;
+    try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+    SY.lastAt=v.updatedAt;SY.dirty=false;saveSync();
+  }finally{applying=false}
+  renderHome();updateCCUI();
+  setSyncStatus('Buluttan alındı: '+fmtDate(v.updatedAt));
+  return true;
+}
+// Uzaktan (başka cihazdan) gelen veri
+function onRemote(v){
+  if(!v||!v.data||v.device===SY.dev||v.updatedAt===SY.lastAt)return;
+  if(cur){pendingRemote=v;showBanner('Diğer cihazda daha yeni veri var. Ana ekrana dönünce uygulanacak.',true);return}
+  if(SY.dirty&&!confirm('Diğer cihazda ('+fmtDate(v.updatedAt)+') daha yeni veri var, ama bu cihazda da henüz gönderilmemiş değişiklikler var.\n\nTamam: buluttaki veri uygulansın\nİptal: bu cihazdaki veri kalsın ve buluta yazılsın')){
+    SY.lastAt=v.updatedAt;saveSync();flushPush();return;
+  }
+  if(applyRemote(v))homeNote('Senkron: diğer cihazdaki ilerleme alındı');
+}
+// Yerel değişiklik: kaydırma sırasında sık save() çağrıldığı için en fazla 20 sn'de bir gönderilir
+function onLocalChange(){
+  if(!SY.code||applying)return;
+  if(!SY.dirty){SY.dirty=true;saveSync()}
+  if(SY.auto&&!pushTimer)pushTimer=setTimeout(()=>{pushTimer=null;autoPush()},20000);
+}
+function flushPush(){
+  if(!SY.code||!SY.auto||!SY.dirty)return;
+  if(pushTimer){clearTimeout(pushTimer);pushTimer=null}
+  autoPush();
+}
+async function autoPush(){
+  if(!SY.code||!SY.auto||pushing)return;
+  try{
+    await fbReady();
+    const v=await cloudGet(SY.code);
+    if(v&&v.device!==SY.dev&&v.updatedAt!==SY.lastAt){onRemote(v);return}
+    await doPush();
+    setSyncStatus('Otomatik gönderildi: '+fmtDate(SY.lastAt));
+  }catch(e){setSyncStatus(errMsg(e))}
+}
+function startListener(){
+  stopListener();
+  if(!SY.code||!SY.auto)return;
+  const ref=firebase.database().ref(SYNC_ROOT+'/'+SY.code);
+  const cb=snap=>onRemote(snap.val());
+  ref.on('value',cb,err=>setSyncStatus(errMsg(err)));
+  fbListening={ref,cb};
+}
+function stopListener(){if(fbListening){try{fbListening.ref.off('value',fbListening.cb)}catch(e){}fbListening=null}}
+
+function refreshSyncUI(){
+  const on=!!SY.code;
+  $('syncOff').style.display=on?'none':'block';
+  $('syncOn').style.display=on?'block':'none';
+  $('syncCodeShow').textContent=SY.code||'';
+  $('btnSyncAuto').textContent='Otomatik senkron: '+(SY.auto?'Açık':'Kapalı');
+  $('btnSyncAuto').classList.toggle('pri',!!SY.auto);
+  setSyncStatus(on?(SY.lastAt?'Son senkron: '+fmtDate(SY.lastAt):'Bağlı.'):'');
+}
+async function busy(btn,fn){
+  btn.disabled=true;
+  try{await fn()}catch(e){setSyncStatus(errMsg(e))}
+  finally{btn.disabled=false}
+}
+$('btnSyncCreate').onclick=()=>busy($('btnSyncCreate'),async()=>{
+  setSyncStatus('Bağlanıyor…');
+  await fbReady();
+  let code=null;
+  for(let i=0;i<6;i++){const c=genCode();if(!(await cloudGet(c))){code=c;break}}
+  if(!code)throw new Error('Kod üretilemedi, tekrar deneyin.');
+  SY.code=code;SY.auto=true;SY.lastAt=0;saveSync();
+  try{await doPush()}catch(e){SY.code='';saveSync();throw e}
+  startListener();refreshSyncUI();
+  setSyncStatus('Bağlandı. Bu kodu diğer cihaza girin: '+code);
+});
+$('btnSyncConnect').onclick=()=>busy($('btnSyncConnect'),async()=>{
+  const code=$('syncCodeIn').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==6){setSyncStatus('Kod 6 karakter olmalı.');return}
+  setSyncStatus('Bağlanıyor…');
+  await fbReady();
+  const v=await cloudGet(code);
+  if(!v||!v.data){setSyncStatus('Bu kodla bulut verisi bulunamadı.');return}
+  if(!confirm('Bulutta '+fmtDate(v.updatedAt)+' tarihli veri var. Bu cihazdaki listeler ve ilerleme bununla değiştirilsin mi? (API anahtarınız cihazda kalır)')){setSyncStatus('İptal edildi.');return}
+  SY.code=code;SY.auto=true;saveSync();
+  if(!applyRemote(v)){SY.code='';saveSync();return}
+  startListener();refreshSyncUI();
+});
+$('btnSyncPush').onclick=()=>busy($('btnSyncPush'),async()=>{
+  setSyncStatus('Yükleniyor…');
+  await fbReady();
+  const v=await cloudGet(SY.code);
+  if(v&&v.device!==SY.dev&&v.updatedAt!==SY.lastAt&&!confirm('Bulutta başka bir cihazdan yüklenmiş daha yeni veri var ('+fmtDate(v.updatedAt)+'). Üzerine yazılsın mı?')){setSyncStatus('İptal edildi.');return}
+  const ts=await doPush();
+  setSyncStatus('Buluta yüklendi: '+fmtDate(ts));
+});
+$('btnSyncPull').onclick=()=>busy($('btnSyncPull'),async()=>{
+  setSyncStatus('İndiriliyor…');
+  await fbReady();
+  const v=await cloudGet(SY.code);
+  if(!v||!v.data){setSyncStatus('Bulutta veri yok.');return}
+  if(!confirm('Bulut verisi ('+fmtDate(v.updatedAt)+') ile bu cihazdaki tüm listeler ve ilerleme değiştirilsin mi?')){setSyncStatus('İptal edildi.');return}
+  applyRemote(v);
+});
+$('btnSyncAuto').onclick=()=>busy($('btnSyncAuto'),async()=>{
+  SY.auto=!SY.auto;saveSync();
+  if(SY.auto){await fbReady();startListener();flushPush()}else{stopListener()}
+  refreshSyncUI();
+});
+$('btnSyncDisc').onclick=()=>{
+  if(!confirm('Senkronizasyon bağlantısı kesilsin mi? Cihazdaki veriler silinmez.'))return;
+  stopListener();
+  if(pushTimer){clearTimeout(pushTimer);pushTimer=null}
+  SY.code='';SY.auto=false;SY.lastAt=0;SY.dirty=false;saveSync();
+  refreshSyncUI();
+};
+
+/* ---------- BAŞLANGIÇ ---------- */
+async function boot(){
+  updateCCUI();
+  renderHome();
+  // Otomatik senkron açıksa: kaldığın yerden devam için önce buluttaki en yeni veriyi kontrol et (en fazla 5 sn)
+  if(SY.code&&SY.auto){
+    try{
+      await withTimeout((async()=>{
+        await fbReady();
+        const v=await cloudGet(SY.code);
+        if(v)onRemote(v);
+      })(),5000,'sync-timeout');
+    }catch(e){}
+    fbReady().then(startListener).catch(()=>{});
+  }
+  if(S.defaultId&&S.lists.some(l=>l.id===S.defaultId))openList(S.defaultId);
+}
+boot();
 })();
 </script>
 </body>
