@@ -44,7 +44,6 @@ header h1{font-size:20px;margin:0;flex:1}
 .cstats>div{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .cstats span{color:var(--mut);font-size:11px}
 .cstats b{color:var(--ok);font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cstats b.lk{color:var(--star)}
 .actions{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;justify-content:space-between}
 .ico{background:#000b;border:0;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:17px}
 .ico.on{color:var(--star)}
@@ -69,7 +68,6 @@ body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
 .ctrl .btn{flex:1;height:48px;padding:0 10px;font-size:19px;display:flex;align-items:center;justify-content:center;gap:6px}
 .ctrl .cc{font-size:13px;font-weight:700;border:2px solid currentColor;border-radius:5px;padding:0 5px;line-height:18px;letter-spacing:.5px}
 #btnCC.on{background:var(--ok);border-color:var(--ok);color:#06220f}
-#btnLike.on{background:var(--star);border-color:var(--star);color:#2a1d00}
 #banner{display:none;background:#3a1a1a;border:1px solid #7a2a2a;color:#ffb0b0;padding:10px 14px;border-radius:10px;margin:10px 0;font-size:14px;line-height:1.4}
 #banner.info{background:#13283a;border-color:#2a5a7a;color:#a9d4ff}
 .items{position:relative;display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto;padding-right:4px}
@@ -144,7 +142,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   <div id="banner"></div>
   <div class="ctrl">
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
-    <button class="btn" id="btnLike" title="Beğen">👍</button>
+    <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
     <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
   </div>
   <div class="items" id="items"></div>
@@ -162,8 +160,8 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
       <button class="srow" data-s="clean"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M4 4l6 6M20 15v5h-5M20 20l-6-6"/></svg><span class="lbl">Ekranı temizle</span></button>
       <button class="srow" data-s="cc"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10.5 10.2a2 2 0 1 0 0 3.6M17 10.2a2 2 0 1 0 0 3.6"/></svg><span class="lbl">Altyazılar</span><span class="val" id="valCC"></span></button>
       <button class="srow" data-s="shape"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5M20 4v4h-4M20 12a8 8 0 0 1-14 5M4 20v-4h4"/></svg><span class="lbl">Dikey / Yatay görünüm</span><span class="val" id="valShape"></span></button>
-      <button class="srow" data-s="fs"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Tam ekran</span></button>
       <button class="srow" data-s="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg><span class="lbl">Listeyi yenile</span></button>
+      <button class="srow" data-s="login"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lbl">YouTube'da oturum aç</span></button>
       <button class="srow" data-s="yt"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span class="lbl">YouTube'da aç</span></button>
     </div>
     <div id="sheetDesc">
@@ -184,6 +182,11 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
     <button class="btn" id="btnExport">Yedekle (JSON indir)</button>
     <button class="btn" id="btnImport">Yedeği yükle</button>
     <input type="file" id="fileImport" accept=".json" style="display:none">
+  </div>
+  <div class="sep">
+    <h4>YouTube hesabı</h4>
+    <div class="row"><button class="btn" id="btnYtLogin">YouTube'da oturum aç</button></div>
+    <p>Google giriş sayfası yeni sekmede açılır. Giriş yapıp uygulamaya dönünce sayfa yenilenir ve oynatıcı hesabınızla çalışır (Premium'da reklamsız izleme, kişiselleştirme). Tarayıcı üçüncü taraf çerezlerini engelliyorsa oturum oynatıcıya yansımayabilir.</p>
   </div>
   <div class="sep">
     <h4>Cihazlar Arası Senkronizasyon (Firebase)</h4>
@@ -236,6 +239,7 @@ function migrate(s){
   s.ccOn=!!s.ccOn;
   s.lists.forEach(l=>{
     l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};l.liked=l.liked||{};
+    if(l.cc===undefined)l.cc=!!s.ccOn;l.fs=!!l.fs;
     l.kind=l.kind||'playlist';l.index=l.index||0;l.time=l.time||0;l.watchSec=l.watchSec||0;
     if(!l.vid&&l.ids[l.index])l.vid=l.ids[l.index];
   });
@@ -335,7 +339,6 @@ function renderHome(){
     const pct=t?Math.min(100,Math.round(w/t*100)):0;
     const tid=l.vid||l.ids[0];
     const th=tid?`style="background-image:url(https://i.ytimg.com/vi/${tid}/mqdefault.jpg)"`:'';
-    const likes=Object.keys(l.liked||{}).length;
     return `<div class="card ${S.defaultId===l.id?'def':''}" data-id="${l.id}">
       <div class="thumb" ${th}>${tid?'':'Önizleme için bir kez açın'}
         <div class="actions">
@@ -354,7 +357,6 @@ function renderHome(){
           <div><span>İzlenen</span><b>${w} / ${t||'?'} video</b></div>
           <div><span>Sıra</span><b>${t?((l.index||0)+1)+' / '+t:'-'}</b></div>
           <div><span>Toplam izlenme süresi</span><b>⏱ ${fmt(l.watchSec)}</b></div>
-          <div><span>Beğenilen</span><b class="lk">👍 ${likes}</b></div>
         </div>
         <div class="meta"><span>${ago(l.lastAt)}</span></div>
       </div></div>`}).join('');
@@ -389,7 +391,7 @@ async function addList(){
 }
 
 /* ---------- OYNATICI ---------- */
-let YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0;
+let YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0,leaving=false,loginPending=false;
 window.onYouTubeIframeAPIReady=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
 const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
 
@@ -406,7 +408,7 @@ function ensurePlayer(){
   if(playerP)return playerP;
   playerP=new Promise(res=>{
     const mk=()=>{
-      const pv={playsinline:1,rel:0,fs:0,cc_load_policy:S.ccOn?1:0};
+      const pv={playsinline:1,rel:0,fs:0,cc_load_policy:(cur&&cur.cc)?1:0};
       if(location.protocol.indexOf('http')===0)pv.origin=location.origin;
       player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
         onReady:()=>{playerReady=true;res()},
@@ -441,7 +443,7 @@ async function openList(id){
   const l=S.lists.find(x=>x.id===id);if(!l)return;
   if(!cur){try{history.pushState({view:'player',listId:id},'')}catch(e){}}
   cur=l;lastHi=-1;ccFor=null;
-  showView('player');hideBanner();applyShape();renderItems();updateLike();updateCCUI();
+  showView('player');hideBanner();applyShape();renderItems();updateCCUI();
   try{await ensurePlayer()}catch(e){return}
   if(cur!==l)return;
   if(!l.ids.length){
@@ -460,9 +462,10 @@ function begin(l){
   let i=l.vid?l.ids.indexOf(l.vid):-1;
   if(i<0)i=Math.min(l.index||0,l.ids.length-1);
   l.index=i;l.vid=l.ids[i];save();
-  renderItems();updateLike();
+  renderItems();
   loadedOk=false;lastLoad=Date.now();
   try{player.loadVideoById({videoId:l.vid,startSeconds:Math.floor(l.time||0)})}catch(e){}
+  if(l.fs&&!isFs())setTimeout(()=>{if(cur===l&&l.fs&&!isFs())toggleFs()},0);
 }
 function playIndex(i){
   if(!cur||!playerReady||i<0||i>=cur.ids.length)return false;
@@ -521,7 +524,10 @@ setInterval(()=>{
     if(tick%5===0){saveProgress();save()}
   }
 },1000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){saveProgress();flushPush()}});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){saveProgress();flushPush()}
+  else if(loginPending){loginPending=false;saveProgress();save();location.reload()}
+});
 window.addEventListener('pagehide',()=>{saveProgress();save();flushPush()});
 
 function renderItems(){
@@ -555,7 +561,6 @@ function highlight(forceScroll){
     const b=$('items');const off=r.offsetTop-60;
     if(forceScroll||Math.abs(b.scrollTop-off)>200)b.scrollTop=off;
   }
-  updateLike();
 }
 $('items').addEventListener('click',e=>{
   const it=e.target.closest('.it');if(!it||!cur)return;
@@ -577,7 +582,7 @@ function goHome(){
   saveProgress();save();
   try{player.pauseVideo()}catch(e){}
   closeSheet();setClean(false);
-  if(isFs())exitFs();
+  leaving=true;if(isFs())exitFs();leaving=false;
   cur=null;showView('home');
   if(pendingRemote){const v=pendingRemote;pendingRemote=null;onRemote(v)}
   else flushPush();
@@ -647,6 +652,7 @@ let wasFs=false;
 function updFs(){
   const now=isFs();
   if(wasFs&&!now)fsExitAt=Date.now();
+  if(now!==wasFs&&cur&&!leaving&&cur.fs!==now){cur.fs=now;save()}
   wasFs=now;
   if(!now){try{screen.orientation.unlock()}catch(e){}}
   updateSwipe();
@@ -669,16 +675,17 @@ function toggleFs(){
 }
 document.addEventListener('fullscreenchange',updFs);
 document.addEventListener('webkitfullscreenchange',updFs);
+$('btnFs').onclick=toggleFs;
 
 /* ---------- ALTYAZI (CC) ---------- */
 function updateCCUI(){
-  $('btnCC').classList.toggle('on',!!S.ccOn);
-  $('valCC').textContent=S.ccOn?'Açık':'Kapalı';
+  $('btnCC').classList.toggle('on',!!(cur&&cur.cc));
+  $('valCC').textContent=(cur&&cur.cc)?'Açık':'Kapalı';
 }
 function applyCC(userAction){
   if(!playerReady)return;
   try{
-    if(S.ccOn){
+    if((cur&&cur.cc)){
       player.loadModule('captions');
       setTimeout(()=>{
         try{
@@ -695,25 +702,12 @@ function applyCC(userAction){
   }catch(e){}
 }
 function toggleCC(){
-  S.ccOn=!S.ccOn;save();updateCCUI();
+  if(!cur)return;cur.cc=!cur.cc;save();updateCCUI();
   ccFor=cur?cur.vid:null;
   applyCC(true);
-  toast(S.ccOn?'Altyazı: açık':'Altyazı: kapalı');
+  toast((cur&&cur.cc)?'Altyazı: açık':'Altyazı: kapalı');
 }
 $('btnCC').onclick=toggleCC;
-
-/* ---------- BEĞENİ ---------- */
-function updateLike(){
-  const on=!!(cur&&cur.liked&&cur.vid&&cur.liked[cur.vid]);
-  const b=$('btnLike');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
-}
-$('btnLike').onclick=()=>{
-  if(!cur||!cur.vid)return;
-  cur.liked=cur.liked||{};
-  if(cur.liked[cur.vid]){delete cur.liked[cur.vid];toast('Beğeni kaldırıldı')}
-  else{cur.liked[cur.vid]=1;toast('👍 Beğenildi')}
-  save();updateLike();
-};
 
 /* ---------- TEMİZ MOD ---------- */
 function setClean(on){
@@ -726,7 +720,7 @@ $('cleanExit').onclick=()=>setClean(false);
 /* ---------- ALT MENÜ (BOTTOM SHEET) ---------- */
 const sheet=$('sheet'),sbody=$('sheetBody');
 function updateSheetVals(){
-  $('valCC').textContent=S.ccOn?'Açık':'Kapalı';
+  $('valCC').textContent=(cur&&cur.cc)?'Açık':'Kapalı';
   $('valShape').textContent=cur&&cur.vertical?'Dikey (9:16)':'Yatay (16:9)';
 }
 function showSheetMain(){$('sheetDesc').style.display='none';$('sheetMain').style.display='block';sbody.scrollTop=0}
@@ -803,10 +797,10 @@ $('sheetMain').addEventListener('click',e=>{
   const a=r.dataset.s;
   if(a==='desc'){showDesc();return}
   if(a==='cc'){toggleCC();updateSheetVals();return}
+  if(a==='login'){closeSheet();openLogin();return}
   closeSheet();
   if(a==='clean'){setClean(true)}
   else if(a==='shape'){cur.vertical=!cur.vertical;save();applyShape()}
-  else if(a==='fs'){toggleFs()}
   else if(a==='refresh'){doRefresh()}
   else if(a==='yt'){
     const id=cur.vid;if(!id)return;
@@ -816,7 +810,14 @@ $('sheetMain').addEventListener('click',e=>{
   }
 });
 
+/* ---------- YOUTUBE OTURUMU ---------- */
+function openLogin(){
+  loginPending=true;
+  window.open('https://accounts.google.com/ServiceLogin?service=youtube&continue='+encodeURIComponent('https://www.youtube.com/'),'_blank','noopener');
+}
+
 /* ---------- AYARLAR / YEDEK ---------- */
+$('btnYtLogin').onclick=openLogin;
 $('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';refreshSyncUI();$('dlg').showModal()};
 $('btnCloseDlg').onclick=()=>$('dlg').close();
 $('btnSaveDlg').onclick=()=>{S.apiKey=$('apiKey').value.trim();save();$('dlg').close()};
@@ -902,7 +903,7 @@ async function cloudGet(code){
   const snap=await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+code).once('value'),12000);
   return snap.val();
 }
-function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId,ccOn:S.ccOn})}
+function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId})}
 async function doPush(){
   pushing=true;
   try{
