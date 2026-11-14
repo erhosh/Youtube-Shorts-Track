@@ -42,9 +42,18 @@ header h1{font-size:20px;margin:0;flex:1}
 .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px}
 .stat b{color:var(--ok)}
-.stage{background:#000;border-radius:12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto}
-.stage.v{aspect-ratio:9/16;max-height:78vh;width:auto}
-#player{width:100%;height:100%}
+.stage{position:relative;background:#000;border-radius:12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto;touch-action:none}
+.stage.v{aspect-ratio:9/16;width:min(100%,calc(78vh * 9 / 16))}
+.stage:fullscreen,.stage.fs{width:100vw!important;height:100vh!important;max-height:none!important;aspect-ratio:auto!important;border-radius:0}
+.stage.fs{position:fixed;inset:0;z-index:999}
+#player{position:absolute;inset:0;width:100%;height:100%}
+/* Videonun üzerindeki kaydırma katmanı; alt şerit YouTube kontrolleri (süre çubuğu) için açık bırakılır */
+#gesture{position:absolute;left:0;right:0;top:0;bottom:48px;z-index:5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.stage:fullscreen #gesture,.stage.fs #gesture{bottom:56px}
+#fsBtn{position:absolute;top:8px;right:8px;z-index:6;width:40px;height:40px;border:0;border-radius:10px;background:#000a;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
+#toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#000b;color:#fff;padding:10px 18px;border-radius:12px;font-size:18px;z-index:7;pointer-events:none;opacity:0;transition:opacity .2s}
+#toast.show{opacity:1}
+.swhint{color:var(--mut);font-size:13px;margin:0 0 10px}
 #player iframe{width:100%;height:100%;border:0}
 .ctrl{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
 #banner{display:none;background:#3a1a1a;border:1px solid #7a2a2a;color:#ffb0b0;padding:10px 14px;border-radius:10px;margin-bottom:10px;font-size:14px}
@@ -95,12 +104,14 @@ dialog .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
     <div class="stat">Bu listede toplam: <b id="stTime">0 dk</b></div>
   </div>
   <div id="banner"></div>
-  <div class="stage" id="stage"><div id="player"></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="fsBtn" title="Tam ekran">⛶</button><div id="toast"></div></div>
   <div class="ctrl">
     <button class="btn" id="btnPrev">⏮ Önceki</button>
     <button class="btn" id="btnNext">Sonraki ⏭</button>
+    <button class="btn" id="btnFs">⛶ Tam ekran</button>
     <button class="btn" id="btnShape">↕ Dikey / Yatay (Shorts)</button>
   </div>
+  <div class="swhint">Videonun üzerinde yukarı kaydır: sonraki · aşağı kaydır: önceki · dokun: duraklat/oynat</div>
   <div class="items" id="items"></div>
 </div>
 
@@ -223,7 +234,7 @@ function openList(id){
 function startPlayback(l){
   const opts={listType:'playlist',list:l.listId,index:l.index||0,startSeconds:Math.floor(l.time||0)};
   if(!player){
-    const pv={playsinline:1,rel:0};
+    const pv={playsinline:1,rel:0,fs:0};
     if(location.protocol.startsWith('http'))pv.origin=location.origin;
     player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
       onReady:()=>{playerReady=true;player.loadPlaylist(opts)},
@@ -311,6 +322,66 @@ $('btnPrev').onclick=()=>{if(playerReady)player.previousVideo()};
 $('btnNext').onclick=()=>{if(playerReady){markCurrent(true);player.nextVideo()}};
 $('btnShape').onclick=()=>{cur.vertical=!cur.vertical;save();applyShape()};
 function applyShape(){$('stage').classList.toggle('v',!!cur.vertical)}
+
+/* ---------- KAYDIRMA + TAM EKRAN ---------- */
+const stage=$('stage'),gest=$('gesture'),toastEl=$('toast');
+let toastT;
+function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),700)}
+function go(dir){
+  if(!playerReady)return;
+  try{
+    if(dir>0){toast('▲ Sonraki');player.nextVideo()}
+    else{toast('▼ Önceki');player.previousVideo()}
+  }catch(e){}
+}
+function togglePlay(){
+  if(!playerReady)return;
+  try{
+    if(player.getPlayerState()===1){player.pauseVideo();toast('⏸')}
+    else{player.playVideo();toast('▶')}
+  }catch(e){}
+}
+let g=null;
+gest.addEventListener('pointerdown',e=>{
+  g={x:e.clientX,y:e.clientY,t:Date.now()};
+  try{gest.setPointerCapture(e.pointerId)}catch(x){}
+});
+gest.addEventListener('pointerup',e=>{
+  if(!g)return;
+  const dx=e.clientX-g.x,dy=e.clientY-g.y,dt=Date.now()-g.t;g=null;
+  if(Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx)*1.2)go(dy<0?1:-1);
+  else if(Math.abs(dx)<12&&Math.abs(dy)<12&&dt<500)togglePlay();
+});
+gest.addEventListener('pointercancel',()=>{g=null});
+let wheelLock=0;
+gest.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const n=Date.now();if(n-wheelLock<600||Math.abs(e.deltaY)<20)return;
+  wheelLock=n;go(e.deltaY>0?1:-1);
+},{passive:false});
+
+function nativeFs(){return document.fullscreenElement||document.webkitFullscreenElement}
+function isFs(){return !!nativeFs()||stage.classList.contains('fs')}
+function updFs(){$('fsBtn').textContent=isFs()?'✕':'⛶';if(!isFs()){try{screen.orientation.unlock()}catch(e){}}}
+function toggleFs(){
+  if(isFs()){
+    if(nativeFs()){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}}
+    stage.classList.remove('fs');updFs();return;
+  }
+  const f=stage.requestFullscreen||stage.webkitRequestFullscreen;
+  const fallback=()=>{stage.classList.add('fs');updFs()};
+  if(f){
+    try{
+      const p=f.call(stage);
+      const lock=()=>{try{screen.orientation.lock(cur&&cur.vertical?'portrait':'landscape').catch(()=>{})}catch(e){}};
+      if(p&&p.then)p.then(lock).catch(fallback);else lock();
+    }catch(e){fallback()}
+  }else fallback();
+}
+document.addEventListener('fullscreenchange',updFs);
+document.addEventListener('webkitfullscreenchange',updFs);
+$('fsBtn').onclick=toggleFs;
+$('btnFs').onclick=toggleFs;
 $('btnBack').onclick=()=>{
   saveProgress();
   try{player.pauseVideo()}catch(e){}
