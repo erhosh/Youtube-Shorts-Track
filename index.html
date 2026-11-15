@@ -78,7 +78,7 @@ html.bp body{background:#000}
 #toast.show{opacity:1}
 #cleanExit{display:none;position:absolute;top:8px;right:8px;z-index:6;width:36px;height:36px;border:0;border-radius:50%;background:#0008;color:#fff;font-size:16px;align-items:center;justify-content:center;opacity:.55}
 body.clean #cleanExit{display:flex}
-body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
+body.clean .ctrl,body.clean #items,body.clean #banner,body.clean .listhead{display:none!important}
 .ctrl{display:flex;gap:10px;margin:12px 0}
 .ctrl .btn{flex:1;height:48px;padding:0 10px;font-size:19px;display:flex;align-items:center;justify-content:center;gap:6px}
 .ctrl .cc{font-size:13px;font-weight:700;border:2px solid currentColor;border-radius:5px;padding:0 5px;line-height:18px;letter-spacing:.5px}
@@ -94,7 +94,7 @@ body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
 .chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
 .chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
 #btnMute.off{background:var(--acc);border-color:var(--acc);color:#fff}
-#dayPop{position:absolute;top:10px;left:50%;transform:translate(-50%,-14px);background:var(--ok);color:#06220f;font-weight:700;font-size:15px;line-height:1.2;padding:8px 16px;border-radius:14px;z-index:8;pointer-events:none;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 4px 14px #0007;max-width:92%}
+#dayPop{position:absolute;top:max(48px,calc(env(safe-area-inset-top,0px) + 38px));left:50%;transform:translate(-50%,-14px);background:var(--ok);color:#06220f;font-weight:700;font-size:15px;line-height:1.2;padding:8px 16px;border-radius:14px;z-index:8;pointer-events:none;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 4px 14px #0007;max-width:92%}
 #dayPop.show{opacity:1;transform:translate(-50%,0)}
 .seekrow{display:flex;align-items:center;gap:6px;margin:10px 0 0}
 .seekrow .tm{font-size:13px;color:var(--mut);min-width:42px;text-align:center;font-variant-numeric:tabular-nums}
@@ -134,6 +134,34 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 .notice.info{background:#13283a;border-color:#2a5a7a;color:#a9d4ff}
 #syncCodeShow{font-size:26px;font-weight:700;letter-spacing:4px;color:var(--ok)}
 #syncStatus{min-height:18px}
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+.listhead span{color:var(--mut);font-size:13px}
+.listhead .btn{padding:6px 12px;font-size:13px}
+#btnNoteNotify.on{background:var(--ok);border-color:var(--ok);color:#06220f}
+#gesture{-webkit-touch-callout:none}
+#noteFab{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:0;background:var(--star);color:#1a1300;font-size:22px;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.55);z-index:6;cursor:pointer;padding:0}
+#noteFab.show{display:flex}
+#noteOv{display:none;position:absolute;inset:0;z-index:9;background:#000b;align-items:flex-start;justify-content:center;padding:max(56px,calc(env(safe-area-inset-top,0px) + 12px)) 12px 12px;overflow:auto}
+#noteOv.show{display:flex}
+#noteBox{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 8px 30px #000a;color:var(--tx)}
+.nh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.nt{background:#2a2f3a;color:var(--ok);padding:1px 8px;border-radius:6px;font-size:12px;font-variant-numeric:tabular-nums;flex:none}
+#noteTxt{width:100%;resize:none;background:var(--bg);border:1px solid var(--line);color:var(--tx);padding:10px;border-radius:8px;font:inherit}
+.nrow{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.nlist{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto}
+.ni{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.ni.hl{border-color:var(--star)}
+.ni .nm{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.ni .na{display:flex;gap:4px;flex:none}
+.ni .na button{background:none;border:0;min-width:34px;height:30px;border-radius:8px;font-size:15px}
+.ni .ntx{font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.ni .src{color:var(--mut);font-size:12px;line-height:1.35;flex:1;min-width:0;word-break:break-word}
+.ni .nrow2{display:flex;gap:8px;margin-top:8px}
+.ni .nrow2 .btn{padding:6px 14px;font-size:13px}
+#undoBar{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:1002;background:#2a2f3a;border:1px solid var(--mut);color:var(--tx);padding:8px 8px 8px 14px;border-radius:12px;font-size:14px;align-items:center;gap:12px;box-shadow:0 6px 20px #000a;max-width:94%}
+#undoBar.show{display:flex}
+#undoBar .btn{padding:6px 12px;background:var(--ok);border-color:var(--ok);color:#06220f;font-weight:600;flex:none}
+#notesList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -143,6 +171,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 <div id="view-home">
   <header>
     <h1>▶ ShortRest</h1>
+    <button class="btn" id="btnNotes">📝 Notlar</button>
     <button class="btn" id="btnInstall" style="display:none">⬇ Yükle</button>
     <button class="btn" id="btnSettings">⚙ Ayarlar</button>
   </header>
@@ -163,7 +192,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div></div>
   <div class="seekrow">
     <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
     <span class="tm" id="tCur">0:00</span>
@@ -173,12 +202,14 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   </div>
   <div id="banner"></div>
   <div class="ctrl">
-    <button class="btn" id="btnHome" title="Ana ekran">🏠</button>
+    <button class="btn" id="btnNoteNotify" title="Not bildirimleri: kayıtlı not saniyesinde simge göster">🔔</button>
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
     <button class="btn" id="btnMute" title="Sesi aç/kapat">🔊</button>
     <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
+    <button class="btn" id="btnHome" title="Ana ekran">🏠</button>
     <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
   </div>
+  <div class="listhead"><span>Videolar</span><button class="btn" id="btnResetWatched">☑ Tüm izlenenleri sıfırla</button></div>
   <div class="items" id="items"></div>
 </div>
 
@@ -206,6 +237,14 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   </div>
 </div>
 
+<div id="undoBar"><span>İzlenme işaretleri kaldırıldı —</span><button class="btn" id="btnUndo">Geri Al</button></div>
+
+<dialog id="dlgNotes">
+  <h3 style="margin:0">📝 Notlar</h3>
+  <div id="notesList"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="btnCloseNotes">Kapat</button></div>
+</dialog>
+
 <dialog id="dlg">
   <h3 style="margin:0 0 4px">Ayarlar</h3>
   <label for="apiKey">YouTube Data API anahtarı</label>
@@ -216,6 +255,11 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
     <button class="btn" id="btnImport">Yedeği yükle</button>
     <input type="file" id="fileImport" accept=".json" style="display:none">
   </div>
+  <div class="row">
+    <button class="btn" id="btnPickDir">📁 Yedek klasörü seç</button>
+    <button class="btn" id="btnClearDir" style="display:none">Klasörü kaldır</button>
+  </div>
+  <p id="dirInfo"></p>
   <div class="sep">
     <h4>Cihazlar Arası Senkronizasyon (Firebase)</h4>
     <div id="syncOff">
@@ -264,11 +308,13 @@ function loadSync(){
 function saveSync(){try{localStorage.setItem(LSS,JSON.stringify(SY))}catch(e){}}
 function migrate(s){
   if(!s||!Array.isArray(s.lists))s={lists:[],defaultId:null,apiKey:''};
-  s.ccOn=!!s.ccOn;
+  s.ccOn=!!s.ccOn;s.noteNotify=!!s.noteNotify;
+  s.notes=(Array.isArray(s.notes)?s.notes:[]).filter(n=>n&&n.id&&n.videoId&&typeof n.time==='number'&&n.text);
   s.lists.forEach(l=>{
     l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};l.liked=l.liked||{};
     if(l.cc===undefined)l.cc=!!s.ccOn;l.fs=!!l.fs;if(typeof l.vertical!=='boolean')l.vertical=true;
     l.kind=l.kind||'playlist';l.index=l.index||0;l.time=l.time||0;l.watchSec=l.watchSec||0;
+    if(l.day&&!Array.isArray(l.day.vids))l.day.vids=[];
     if(!l.vid&&l.ids[l.index])l.vid=l.ids[l.index];
   });
   return s;
@@ -424,6 +470,7 @@ async function addList(){
 /* ---------- OYNATICI ---------- */
 let needGesturePush=false,YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0,leaving=false;
 let ccHint=false;
+let suppressMark=null,gotoHold=null,noteOpen=false,noteMode='',fabId=null,fabT=null,inWin={},undoSnap=null,undoT=null;
 window.__ytCb=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
 if(window.__ytReady)window.__ytCb();
 
@@ -480,7 +527,7 @@ async function openList(id){
     needGesturePush=!(navigator.userActivation&&navigator.userActivation.isActive);
   }
   cur=l;lastHi=-1;ccFor=null;
-  showView('player');hideBanner();applyShape();renderItems();updateCCUI();
+  showView('player');hideBanner();applyShape();renderItems();updateCCUI();updNoteUI();
   try{await ensurePlayer()}catch(e){return}
   if(cur!==l)return;
   if(!l.ids.length){
@@ -494,21 +541,27 @@ async function openList(id){
   }
   begin(l);
 }
+function loadReset(){countedLoad=false;loadedOk=false;lastLoad=Date.now();suppressMark=null;resetFab()}
 function begin(l){
   if(l.startVid){const i=l.ids.indexOf(l.startVid);if(i>=0){l.index=i;l.vid=l.startVid;l.time=0}l.startVid=null}
   let i=l.vid?l.ids.indexOf(l.vid):-1;
   if(i<0)i=Math.min(l.index||0,l.ids.length-1);
   l.index=i;l.vid=l.ids[i];save();
   renderItems();
-  countedLoad=false;loadedOk=false;lastLoad=Date.now();
-  try{player.loadVideoById({videoId:l.vid,startSeconds:Math.floor(l.time||0)})}catch(e){}
+  loadReset();
+  // Nottan açılışta video o saniyeye alınır ama oynatılmaz (cue = duraklatılmış bekler)
+  const hold=gotoHold&&gotoHold.id===l.id&&gotoHold.vid===l.vid;gotoHold=null;
+  try{
+    if(hold)player.cueVideoById({videoId:l.vid,startSeconds:l.time||0});
+    else player.loadVideoById({videoId:l.vid,startSeconds:Math.floor(l.time||0)});
+  }catch(e){}
   if(l.fs&&!isFs())setTimeout(()=>{if(cur===l&&l.fs&&!isFs())toggleFs()},0);
-  ensureAutoplay(l);
+  if(!hold)ensureAutoplay(l);
 }
 function playIndex(i){
   if(!cur||!playerReady||i<0||i>=cur.ids.length)return false;
   cur.index=i;cur.vid=cur.ids[i];cur.time=0;cur.lastAt=Date.now();save();
-  countedLoad=false;loadedOk=false;lastLoad=Date.now();updateSwipe();
+  loadReset();updateSwipe();
   try{player.loadVideoById({videoId:cur.vid})}catch(e){}
   highlight();
   return true;
@@ -559,8 +612,8 @@ setInterval(()=>{
   if(st===1){
     cur.watchSec=(cur.watchSec||0)+1;dayOf(cur).sec++;tick++;
     try{const d=player.getDuration(),t=player.getCurrentTime();
-      if(d>0&&t/d>=0.9)countWatch();
-      if(d>0&&t/d>=0.9&&cur.vid&&!cur.watched[cur.vid]){cur.watched[cur.vid]=1;setRowWatched(cur.vid);save()}}catch(e){}
+      if(d>0&&t/d>=0.9&&curVid()===cur.vid)countWatch();
+      if(d>0&&t/d>=0.9&&curVid()===cur.vid&&cur.vid&&suppressMark!==cur.vid&&!cur.watched[cur.vid]){cur.watched[cur.vid]=1;setRowWatched(cur.vid);save()}}catch(e){}
     if(tick%5===0){saveProgress();save()}
   }
 },1000);
@@ -632,7 +685,7 @@ function goHome(){
   if(!cur)return;
   saveProgress();save();
   try{player.pauseVideo()}catch(e){}
-  closeSheet();setClean(false);
+  closeSheet();closeNote(false);hideUndo();resetFab();setClean(false);
   leaving=true;if(isFs())exitFs();leaving=false;
   cur=null;showView('home');
   if(pendingRemote){const v=pendingRemote;pendingRemote=null;onRemote(v)}
@@ -643,9 +696,10 @@ $('btnHome').onclick=homeBtn;
 window.addEventListener('popstate',()=>{
   if(!cur)return;
   // Açık bir katman (menü, temiz mod, tam ekran) varsa geri tuşu önce onu kapatır
-  const consumed=sheetOpen||cleanMode||isFs()||(Date.now()-fsExitAt<500);
+  const consumed=noteOpen||sheetOpen||cleanMode||isFs()||(Date.now()-fsExitAt<500);
   if(consumed){
-    if(sheetOpen)closeSheet();
+    if(noteOpen)closeNote(true);
+    else if(sheetOpen)closeSheet();
     else if(cleanMode)setClean(false);
     else if(isFs())exitFs();
     try{history.pushState({view:'player',listId:cur.id},'')}catch(e){}
@@ -670,15 +724,23 @@ function togglePlay(){
     else{player.playVideo();toast('▶')}
   }catch(e){}
 }
-let g=null,lastTap=0,tapT=null;
+let g=null,lastTap=0,tapT=null,lpT=null;
+const EDGE=48; // tam ekranda üst kenar güvenli bölgesi (px): sistem bildirim paneli jesti
 gest.addEventListener('pointerdown',e=>{
+  clearTimeout(lpT);lpT=null;
+  // Tam ekranda üst kenardan başlayan dokunuş sistem jestine bırakılır: video kaydırma / basılı tutma başlatılmaz
+  if(isFs()&&e.clientY<=EDGE){g=null;return}
   g={x:e.clientX,y:e.clientY,t:Date.now(),mode:null};
   try{gest.setPointerCapture(e.pointerId)}catch(x){}
+  // Basılı tutma (~500 ms, kayma yoksa): not ekle
+  lpT=setTimeout(()=>{lpT=null;if(g&&!g.mode&&!g.moved&&!g.lp){g.lp=true;openNoteAdd()}},500);
 });
+gest.addEventListener('contextmenu',e=>e.preventDefault());
 // Yatay sürükleme: videoyu ileri/geri sar (parmak bırakılınca uygulanır)
 gest.addEventListener('pointermove',e=>{
   if(!g)return;
   const dx=e.clientX-g.x,dy=e.clientY-g.y;
+  if(!g.moved&&(Math.abs(dx)>10||Math.abs(dy)>10)){g.moved=true;clearTimeout(lpT);lpT=null}
   if(!g.mode&&Math.abs(dx)>14&&Math.abs(dx)>Math.abs(dy)*1.3){
     g.mode='h';
     try{g.t0=player.getCurrentTime();g.d=player.getDuration()}catch(x){g.t0=0;g.d=0}
@@ -693,6 +755,8 @@ gest.addEventListener('pointermove',e=>{
 });
 gest.addEventListener('pointerup',e=>{
   if(!g)return;
+  clearTimeout(lpT);lpT=null;
+  if(g.lp){g=null;return}
   const dx=e.clientX-g.x,dy=e.clientY-g.y,dt=Date.now()-g.t,mode=g.mode,tg=g.tg;g=null;
   if(autoMuted){doUnmute();if(mode!=='h'&&Math.abs(dx)<12&&Math.abs(dy)<12)return}
   if(mode==='h'){try{player.seekTo(tg,true)}catch(x){}afterSeek();return}
@@ -705,7 +769,7 @@ gest.addEventListener('pointerup',e=>{
     else{lastTap=now;tapT=setTimeout(togglePlay,280)}
   }
 });
-gest.addEventListener('pointercancel',()=>{g=null});
+gest.addEventListener('pointercancel',()=>{clearTimeout(lpT);lpT=null;g=null});
 let wheelLock=0;
 gest.addEventListener('wheel',e=>{
   if(!stage.classList.contains('swipe'))return;
@@ -818,8 +882,10 @@ function ensureAutoplay(l){
 /* ---------- GÜNLÜK SAYAÇ ---------- */
 let countedLoad=false,popT;
 function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function dayOf(l){const k=todayKey();if(!l.day||l.day.d!==k)l.day={d:k,n:0,sec:0};return l.day}
-function peekDay(l){const k=todayKey();return(l.day&&l.day.d===k)?l.day:{n:0,sec:0}}
+function dayOf(l){const k=todayKey();if(!l.day||l.day.d!==k)l.day={d:k,n:0,sec:0,vids:[]};if(!Array.isArray(l.day.vids))l.day.vids=[];return l.day}
+function peekDay(l){const k=todayKey();return(l.day&&l.day.d===k)?l.day:{n:0,sec:0,vids:[]}}
+// Aynı video bugün (herhangi bir listede) zaten sayıldı mı?
+function seenToday(id){for(const l of S.lists){const d=peekDay(l);if(d.vids&&d.vids.indexOf(id)>=0)return true}return false}
 function todayTotal(){let n=0;for(const l of S.lists)n+=peekDay(l).n;return n}
 function showDayPop(n){
   const p=$('dayPop');p.textContent='Bugün '+n+' video izlediniz';
@@ -827,11 +893,12 @@ function showDayPop(n){
 }
 // Bir video bitince ya da %90'ına gelince bir kez sayılır; her 5. videoda bilgi kutusu çıkar
 function countWatch(){
-  if(countedLoad||!cur)return;
+  if(countedLoad||!cur||!cur.vid)return;
   countedLoad=true;
-  dayOf(cur).n++;save();
+  if(seenToday(cur.vid))return; // tekrar izleme sayılmaz
+  const d=dayOf(cur);d.vids.push(cur.vid);d.n++;save();
   const n=todayTotal();
-  if(n%5===0)showDayPop(n);
+  if(n%5===0)showDayPop(n); // her 5 tekil videonun 5.'sinin %90'ında
 }
 
 /* ---------- ALTYAZI (CC) ---------- */
@@ -971,14 +1038,222 @@ $('sheetMain').addEventListener('click',e=>{
   }
 });
 
+/* ---------- NOTLAR ---------- */
+const noteOv=$('noteOv'),noteBox=$('noteBox'),noteFab=$('noteFab');
+function newId(){return 'n'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function fmtNT(s){s=Math.max(0,Math.floor(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;const p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(x)}
+function saveQuiet(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+function notesOfVideo(){return cur?S.notes.filter(n=>n.listId===cur.id&&n.videoId===cur.vid):[]}
+function updNoteUI(){$('btnNoteNotify').classList.toggle('on',!!S.noteNotify)}
+$('btnNoteNotify').onclick=()=>{
+  S.noteNotify=!S.noteNotify;saveQuiet();updNoteUI();
+  if(S.noteNotify)inWin={};else resetFab();
+  toast(S.noteNotify?'Not bildirimi: açık':'Not bildirimi: kapalı');
+};
+
+// Yüzer not simgesi: yalnızca bildirim açıkken, kayıtlı not saniyesine gelince 5 sn görünür
+function hideFab(){clearTimeout(fabT);fabT=null;fabId=null;noteFab.classList.remove('show')}
+function resetFab(){inWin={};hideFab()}
+function showFab(id){fabId=id;noteFab.classList.add('show');clearTimeout(fabT);fabT=setTimeout(hideFab,5000)}
+function checkNoteFab(){
+  if(!cur||!playerReady||!S.noteNotify||noteOpen||document.hidden||$('view-player').style.display==='none')return;
+  let t,v;try{t=player.getCurrentTime();v=curVid()}catch(e){return}
+  if(v!==cur.vid)return;
+  const now={};let best=null,bd=1e9;
+  for(const n of S.notes){
+    if(n.listId!==cur.id||n.videoId!==cur.vid)continue;
+    const d=Math.abs(n.time-t);
+    if(d<=1.5){now[n.id]=1;if(!inWin[n.id]&&d<bd){best=n;bd=d}}
+  }
+  inWin=now; // pencereden çıkan not, geri dönüşte yeniden tetiklenir
+  if(best)showFab(best.id);
+}
+setInterval(checkNoteFab,250);
+
+function noteShow(){noteOv.classList.add('show');noteOpen=true}
+function closeNote(resume){
+  if(!noteOpen)return;
+  noteOpen=false;noteMode='';noteOv.classList.remove('show');noteBox.innerHTML='';
+  try{if(document.activeElement)document.activeElement.blur()}catch(e){}
+  if(resume&&cur&&playerReady){try{player.playVideo()}catch(e){}}
+}
+function curTitle(){
+  let t=(cur&&cur.titles[cur.vid])||'';
+  try{const d=player.getVideoData();if(d&&d.video_id===cur.vid&&d.title)t=d.title}catch(e){}
+  return t;
+}
+function addNote(text,time){
+  S.notes.push({id:newId(),listId:cur.id,videoId:cur.vid,videoTitle:curTitle(),time:Math.round(time*10)/10,text:text,createdAt:Date.now()});
+  save();
+}
+function openNoteAdd(){
+  if(!cur||!cur.vid||!playerReady||noteOpen||sheetOpen)return;
+  let t=0;try{t=player.getCurrentTime()}catch(e){}
+  try{player.pauseVideo()}catch(e){}
+  hideFab();
+  renderNoteForm({time:t});
+}
+function openNoteView(id){
+  if(!cur||!playerReady||noteOpen)return;
+  try{player.pauseVideo()}catch(e){}
+  renderNoteList(id);
+}
+function renderNoteForm(o){
+  noteMode='form';
+  noteBox.innerHTML='<div class="nh"><b>'+(o.id?'Notu düzenle':'Not ekle')+'</b><span class="nt">'+fmtNT(o.time)+'</span></div>'+
+    '<textarea id="noteTxt" maxlength="500" rows="3" placeholder="Notunuzu yazın…"></textarea>'+
+    '<div class="nrow"><button class="btn" id="noteCancel">İptal</button><button class="btn pri" id="noteOk">Tamam</button></div>';
+  const ta=$('noteTxt');ta.value=o.text||'';
+  noteShow();
+  setTimeout(()=>{try{ta.focus()}catch(e){}},60);
+  $('noteCancel').onclick=()=>{if(o.id)renderNoteList(o.id);else closeNote(true)};
+  $('noteOk').onclick=()=>{
+    const txt=ta.value.trim();
+    if(o.id){
+      const n=S.notes.find(x=>x.id===o.id);
+      if(n&&txt){n.text=txt;save()}
+      renderNoteList(o.id);
+    }else{
+      if(txt)addNote(txt,o.time);
+      closeNote(true);
+      toast(txt?'📝 Not kaydedildi':'Boş not kaydedilmedi');
+    }
+  };
+}
+function renderNoteList(focusId){
+  noteMode='list';
+  const arr=notesOfVideo().sort((a,b)=>a.time-b.time);
+  if(focusId){const i=arr.findIndex(n=>n.id===focusId);if(i>0)arr.unshift(arr.splice(i,1)[0])}
+  noteBox.innerHTML='<div class="nh"><b>Notlar</b><span class="nt">'+arr.length+'</span></div>'+
+    (arr.length?'<div class="nlist">'+arr.map(n=>'<div class="ni'+(n.id===focusId?' hl':'')+'" data-id="'+n.id+'"><div class="nm"><span class="nt">'+fmtNT(n.time)+'</span><span class="na"><button data-a="edit" title="Düzenle">✎</button><button data-a="del" title="Sil">🗑</button></span></div><div class="ntx">'+esc(n.text)+'</div></div>').join('')+'</div>'
+      :'<div class="ntx" style="color:var(--mut)">Bu videoda not yok.</div>')+
+    '<div class="nrow"><button class="btn pri" id="noteClose">Kapat</button></div>';
+  noteShow();
+}
+noteFab.onclick=()=>{const id=fabId;resetFab();inWin[id]=1;openNoteView(id)};
+noteOv.addEventListener('click',e=>{if(e.target===noteOv&&noteMode==='list')closeNote(true)});
+noteBox.addEventListener('click',e=>{
+  if(noteMode!=='list')return;
+  if(e.target.id==='noteClose'){closeNote(true);return}
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const row=b.closest('.ni');if(!row)return;
+  const n=S.notes.find(x=>x.id===row.dataset.id);if(!n)return;
+  if(b.dataset.a==='edit')renderNoteForm({id:n.id,time:n.time,text:n.text});
+  else if(b.dataset.a==='del'){
+    if(b.dataset.arm){S.notes=S.notes.filter(x=>x.id!==n.id);save();renderNoteList()}
+    else{b.dataset.arm='1';b.textContent='Sil?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='🗑'}},2500)}
+  }
+});
+
+/* ---------- TOPLU İZLENDİ SIFIRLAMA + GERİ AL ---------- */
+function hideUndo(){clearTimeout(undoT);undoT=null;undoSnap=null;$('undoBar').classList.remove('show')}
+$('btnResetWatched').onclick=()=>{
+  if(!cur)return;
+  if(!Object.keys(cur.watched).length){toast('İzlenmiş video yok');return}
+  undoSnap={id:cur.id,watched:Object.assign({},cur.watched)};
+  cur.watched={};suppressMark=cur.vid;
+  save();renderItems();
+  $('undoBar').classList.add('show');clearTimeout(undoT);undoT=setTimeout(hideUndo,10000);
+};
+$('btnUndo').onclick=()=>{
+  const s=undoSnap;if(!s)return;
+  const l=S.lists.find(x=>x.id===s.id);
+  if(l){l.watched=s.watched;save();if(cur===l)renderItems()}
+  hideUndo();
+};
+
+/* ---------- ANA EKRAN: NOT LİSTESİ ---------- */
+function renderNotes(){
+  const box=$('notesList');
+  const arr=S.notes.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!arr.length){box.innerHTML='<div class="empty">Henüz not yok. Oynatıcıda videoya basılı tutarak not ekleyin.</div>';return}
+  box.innerHTML=arr.map(n=>{
+    const l=S.lists.find(x=>x.id===n.listId);
+    const vt=n.videoTitle||(l&&l.titles[n.videoId])||'Video';
+    return '<div class="ni" data-id="'+n.id+'"><div class="nm"><span class="nt">'+fmtNT(n.time)+'</span><span class="src">'+esc(l?l.name:'(silinmiş liste)')+' › '+esc(vt)+'</span></div><div class="ntx">'+esc(n.text)+'</div><div class="nrow2"><button class="btn pri" data-a="go"'+(l?'':' disabled')+'>Git</button><button class="btn" data-a="del">Sil</button></div></div>';
+  }).join('');
+}
+function goNote(id){
+  const n=S.notes.find(x=>x.id===id);if(!n)return;
+  const l=S.lists.find(x=>x.id===n.listId);
+  if(!l){alert('Bu notun ait olduğu liste silinmiş.');return}
+  if(l.ids.length&&l.ids.indexOf(n.videoId)<0){alert('Bu video artık listede yok.');return}
+  $('dlgNotes').close();
+  l.vid=n.videoId;l.time=n.time;l.startVid=null;
+  const i=l.ids.indexOf(n.videoId);if(i>=0)l.index=i;
+  gotoHold={id:l.id,vid:n.videoId};
+  openList(l.id);
+}
+$('btnNotes').onclick=()=>{renderNotes();$('dlgNotes').showModal()};
+$('btnCloseNotes').onclick=()=>$('dlgNotes').close();
+$('notesList').addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const row=b.closest('.ni');if(!row)return;
+  const id=row.dataset.id;
+  if(b.dataset.a==='go'){goNote(id);return}
+  if(b.dataset.a==='del'){
+    if(b.dataset.arm){S.notes=S.notes.filter(x=>x.id!==id);save();renderNotes()}
+    else{b.dataset.arm='1';b.textContent='Emin misin?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='Sil'}},2500)}
+  }
+});
+
 /* ---------- AYARLAR / YEDEK ---------- */
-$('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';refreshSyncUI();$('dlg').showModal()};
+$('btnSettings').onclick=()=>{$('apiKey').value=S.apiKey||'';refreshSyncUI();refreshDirUI();$('dlg').showModal()};
 $('btnCloseDlg').onclick=()=>$('dlg').close();
 $('btnSaveDlg').onclick=()=>{S.apiKey=$('apiKey').value.trim();save();$('dlg').close()};
-$('btnExport').onclick=()=>{
-  const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+// Yedek klasörü: DirectoryHandle IndexedDB'de saklanır. İzin (query/requestPermission) YALNIZCA "Yedekle" anında istenir;
+// açılışta ve Ayarlar açılırken izne hiç dokunulmaz (yalnızca kayıtlı klasörün adı okunur).
+const FSA=typeof window.showDirectoryPicker==='function';
+let dirHandle=null;
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('shortrestFS',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbGet(k){const d=await idbOpen();return new Promise((res,rej)=>{const q=d.transaction('h').objectStore('h').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function idbSet(k,v){const d=await idbOpen();return new Promise((res,rej)=>{const t=d.transaction('h','readwrite');t.objectStore('h').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}
+async function idbDel(k){const d=await idbOpen();return new Promise((res,rej)=>{const t=d.transaction('h','readwrite');t.objectStore('h').delete(k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}
+function dirStatus(t){$('dirInfo').textContent=t||''}
+async function refreshDirUI(){
+  if(!FSA){$('btnPickDir').style.display='none';$('btnClearDir').style.display='none';dirStatus('Bu tarayıcı klasör seçmeyi desteklemiyor; yedek standart indirme ile kaydedilir.');return}
+  if(!dirHandle){try{dirHandle=(await idbGet('backupDir'))||null}catch(e){}}
+  $('btnClearDir').style.display=dirHandle?'':'none';
+  dirStatus(dirHandle?'Yedek klasörü: '+dirHandle.name:'Klasör seçilmedi; yedek standart indirme ile kaydedilir.');
+}
+$('btnPickDir').onclick=async()=>{
+  try{
+    const h=await window.showDirectoryPicker({mode:'readwrite',id:'shortrest-backup'});
+    dirHandle=h;await idbSet('backupDir',h);refreshDirUI();
+  }catch(e){if(!e||e.name!=='AbortError')dirStatus('Klasör seçilemedi: '+((e&&e.message)||e))}
+};
+$('btnClearDir').onclick=async()=>{
+  dirHandle=null;try{await idbDel('backupDir')}catch(e){}
+  refreshDirUI();
+};
+function downloadBackup(name,text){
+  const b=new Blob([text],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
-  a.download='shortrest-yedek-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href)};
+  a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+$('btnExport').onclick=async()=>{
+  const name='shortrest-yedek-'+todayKey()+'.json';
+  const text=JSON.stringify(S,null,2);
+  if(FSA){
+    try{
+      if(!dirHandle)dirHandle=(await idbGet('backupDir'))||null;
+      const h=dirHandle;
+      if(h){
+        let p='prompt';
+        if(h.queryPermission)p=await h.queryPermission({mode:'readwrite'});
+        if(p!=='granted')p=await h.requestPermission({mode:'readwrite'});
+        if(p==='granted'){
+          const fh=await h.getFileHandle(name,{create:true});
+          const w=await fh.createWritable();await w.write(text);await w.close();
+          dirStatus('Yedek kaydedildi: '+h.name+'/'+name);
+          return;
+        }
+        dirStatus('Klasör izni verilmedi; yedek indirme olarak kaydedildi.');
+      }
+    }catch(e){dirStatus('Klasöre yazılamadı ('+((e&&e.name)||'hata')+'); yedek indirme olarak kaydedildi.')}
+  }
+  downloadBackup(name,text);
+};
 $('btnImport').onclick=()=>$('fileImport').click();
 $('fileImport').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -1059,7 +1334,7 @@ async function cloudGet(code){
   const snap=await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+code).once('value'),12000);
   return snap.val();
 }
-function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId})}
+function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId,notes:S.notes})}
 async function doPush(){
   pushing=true;
   try{
@@ -1074,12 +1349,13 @@ function applyRemote(v){
   if(!inc||!Array.isArray(inc.lists)){setSyncStatus('Bulut verisi geçersiz.');return false}
   applying=true;
   try{
-    const key=S.apiKey;
-    S=migrate(inc);S.apiKey=key;
+    const key=S.apiKey,nn=S.noteNotify,oldNotes=S.notes;
+    S=migrate(inc);S.apiKey=key;S.noteNotify=nn;
+    if(!Array.isArray(inc.notes))S.notes=oldNotes; // eski sürümden gelen veri yerel notları silmesin
     try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
     SY.lastAt=v.updatedAt;SY.dirty=false;saveSync();
   }finally{applying=false}
-  renderHome();updateCCUI();
+  renderHome();updateCCUI();updNoteUI();if($('dlgNotes').open)renderNotes();
   setSyncStatus('Buluttan alındı: '+fmtDate(v.updatedAt));
   return true;
 }
@@ -1200,7 +1476,7 @@ function bootShell(l){
   ensurePlayer();
 }
 async function boot(){
-  updateCCUI();
+  updateCCUI();updNoteUI();
   const dl0=S.defaultId&&S.lists.find(l=>l.id===S.defaultId);
   if(dl0)bootShell(dl0);else{document.documentElement.classList.remove('bp');renderHome()}
   // Otomatik senkron açıksa buluttaki en yeni veriyi kısa süre (en fazla 1,5 sn) bekle; oynatıcı bu sırada yükleniyor
