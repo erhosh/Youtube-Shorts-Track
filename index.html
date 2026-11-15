@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ShortRest</title>
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://i.ytimg.com">
+<script>
+(function(){
+  try{
+    var s=JSON.parse(localStorage.getItem('ytListeDevam_v1')||'null');
+    if(s&&s.defaultId&&(s.lists||[]).some(function(l){return l.id===s.defaultId}))document.documentElement.className='bp';
+  }catch(e){}
+  window.onYouTubeIframeAPIReady=function(){window.__ytReady=1;if(window.__ytCb)window.__ytCb()};
+  var t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';t.async=true;document.head.appendChild(t);
+})();
+</script>
 <meta name="theme-color" content="#0f1115">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,6 +63,9 @@ header h1{font-size:20px;margin:0;flex:1}
 .hint{color:var(--mut);font-size:13px;margin:0 0 16px;line-height:1.5}
 /* player view */
 #view-player{display:none}
+html.bp #view-home{display:none}
+html.bp #view-player{display:block}
+html.bp body{background:#000}
 .stage{position:relative;background:#000;border-radius:0 0 12px 12px;overflow:hidden;width:min(100%,calc(78vh * 9 / 16));aspect-ratio:9/16;margin:0 auto}
 .stage.h{aspect-ratio:16/9;width:100%}
 .stage:fullscreen,.stage.fs{width:100vw!important;height:100vh!important;max-height:none!important;aspect-ratio:auto!important;border-radius:0}
@@ -408,8 +423,9 @@ async function addList(){
 
 /* ---------- OYNATICI ---------- */
 let needGesturePush=false,YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0,leaving=false;
-window.onYouTubeIframeAPIReady=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
-const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+let ccHint=false;
+window.__ytCb=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
+if(window.__ytReady)window.__ytCb();
 
 function showView(v){
   $('view-home').style.display=v==='home'?'block':'none';
@@ -424,7 +440,7 @@ function ensurePlayer(){
   if(playerP)return playerP;
   playerP=new Promise(res=>{
     const mk=()=>{
-      const pv={playsinline:1,autoplay:1,rel:0,fs:0,cc_load_policy:(cur&&cur.cc)?1:0};
+      const pv={playsinline:1,autoplay:1,rel:0,fs:0,cc_load_policy:ccHint?1:0};
       if(location.protocol.indexOf('http')===0)pv.origin=location.origin;
       player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
         onReady:()=>{playerReady=true;res()},
@@ -1174,21 +1190,32 @@ $('btnSyncDisc').onclick=()=>{
 };
 
 /* ---------- BAŞLANGIÇ ---------- */
+function bootShell(l){
+  // Ana ekranı hiç göstermeden, kayıtlı ayarlarla (dikey/yatay, tam ekran, altyazı) oynatıcı kabuğunu hemen kur
+  ccHint=!!l.cc;
+  showView('player');
+  document.documentElement.classList.remove('bp');
+  stage.classList.toggle('h',l.vertical===false);
+  if(l.fs){stage.classList.add('fs');updFs()}
+  ensurePlayer();
+}
 async function boot(){
   updateCCUI();
-  renderHome();
-  // Otomatik senkron açıksa: kaldığın yerden devam için önce buluttaki en yeni veriyi kontrol et (en fazla 5 sn)
+  const dl0=S.defaultId&&S.lists.find(l=>l.id===S.defaultId);
+  if(dl0)bootShell(dl0);else{document.documentElement.classList.remove('bp');renderHome()}
+  // Otomatik senkron açıksa buluttaki en yeni veriyi kısa süre (en fazla 1,5 sn) bekle; oynatıcı bu sırada yükleniyor
   if(SY.code&&SY.auto){
     try{
       await withTimeout((async()=>{
         await fbReady();
         const v=await cloudGet(SY.code);
         if(v)onRemote(v);
-      })(),5000,'sync-timeout');
+      })(),1500,'sync-timeout');
     }catch(e){}
     fbReady().then(startListener).catch(()=>{});
   }
   if(S.defaultId&&S.lists.some(l=>l.id===S.defaultId))openList(S.defaultId);
+  else if(dl0){showView('home');stage.classList.remove('fs');updFs();renderHome()}
 }
 boot();
 })();
