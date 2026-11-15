@@ -158,6 +158,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   </div>
   <div id="banner"></div>
   <div class="ctrl">
+    <button class="btn" id="btnHome" title="Ana ekran">🏠</button>
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
     <button class="btn" id="btnMute" title="Sesi aç/kapat">🔊</button>
     <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
@@ -406,7 +407,7 @@ async function addList(){
 }
 
 /* ---------- OYNATICI ---------- */
-let YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0,leaving=false;
+let needGesturePush=false,YTready=false,player=null,playerReady=false,playerP=null,onApi=[],cur=null,loadedOk=false,tick=0,lastHi=-1,lastLoad=0,ccFor=null,cleanMode=false,sheetOpen=false,fsExitAt=0,leaving=false;
 window.onYouTubeIframeAPIReady=function(){YTready=true;onApi.forEach(f=>f());onApi=[]};
 const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
 
@@ -456,7 +457,12 @@ async function ensureIds(l){
 }
 async function openList(id){
   const l=S.lists.find(x=>x.id===id);if(!l)return;
-  if(!cur){try{history.pushState({view:'player',listId:id},'')}catch(e){}}
+  if(!cur){
+    try{history.pushState({view:'player',listId:id},'')}catch(e){}
+    // Android Chrome, kullanıcı etkileşimi olmadan eklenen geçmiş girdilerini geri tuşunda atlar (uygulama kapanır).
+    // Açılışta otomatik açılan listede, ilk dokunuşta geçerli bir girdi daha eklenir.
+    needGesturePush=!(navigator.userActivation&&navigator.userActivation.isActive);
+  }
   cur=l;lastHi=-1;ccFor=null;
   showView('player');hideBanner();applyShape();renderItems();updateCCUI();
   try{await ensurePlayer()}catch(e){return}
@@ -592,7 +598,21 @@ async function doRefresh(){
 }
 
 /* ---------- ANA EKRANA DÖNÜŞ (History API) ---------- */
+document.addEventListener('pointerdown',()=>{
+  if(needGesturePush&&cur){
+    needGesturePush=false;
+    try{history.pushState({view:'player',listId:cur.id},'')}catch(e){}
+  }
+},true);
+function homeBtn(){
+  if(!cur)return;
+  if(history.state&&history.state.view==='player'){
+    history.back();
+    setTimeout(()=>{if(cur)goHome()},500);
+  }else goHome();
+}
 function goHome(){
+  needGesturePush=false;
   if(!cur)return;
   saveProgress();save();
   try{player.pauseVideo()}catch(e){}
@@ -603,6 +623,7 @@ function goHome(){
   else flushPush();
   renderHome();
 }
+$('btnHome').onclick=homeBtn;
 window.addEventListener('popstate',()=>{
   if(!cur)return;
   // Açık bir katman (menü, temiz mod, tam ekran) varsa geri tuşu önce onu kapatır
@@ -965,14 +986,16 @@ if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){
 
 /* ---------- BAŞLANGIÇ ---------- */
 /* ---------- FIREBASE SENKRONİZASYON ---------- */
-// >>> Firebase konsolundan (Proje ayarları → Web uygulaması) aldığınız yapılandırmayı buraya yazın.
-// SyncPod / Edinim Takip'te kullandığınız aynı proje (tracker-49c34) yapılandırmasını kopyalayabilirsiniz.
+// Firebase yapılandırması (SyncPod / Edinim Takip ile aynı proje: tracker-49c34)
 const FB_CONFIG={
-  apiKey:"BURAYA_API_KEY",
+  apiKey:"AIzaSyALPLQHOOvpHFaCYyt0woQKH95LsQzWe9I",
   authDomain:"tracker-49c34.firebaseapp.com",
   databaseURL:"https://tracker-49c34-default-rtdb.europe-west1.firebasedatabase.app",
   projectId:"tracker-49c34",
-  appId:"BURAYA_APP_ID"
+  storageBucket:"tracker-49c34.firebasestorage.app",
+  messagingSenderId:"930984105000",
+  appId:"1:930984105000:web:9f70ecfdc67c808709911d",
+  measurementId:"G-74GJXLWJFS"
 };
 const SYNC_ROOT='shortrest_sync'; // tracker: sync/, syncpod: syncpod_sync/ — çakışmaz
 let fbP=null,fbListening=null,pushTimer=null,pushing=false,applying=false,pendingRemote=null,noteT;
