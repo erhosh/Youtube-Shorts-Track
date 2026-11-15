@@ -51,8 +51,8 @@ header h1{font-size:20px;margin:0;flex:1}
 .hint{color:var(--mut);font-size:13px;margin:0 0 16px;line-height:1.5}
 /* player view */
 #view-player{display:none}
-.stage{position:relative;background:#000;border-radius:0 0 12px 12px;overflow:hidden;width:100%;aspect-ratio:16/9;margin:0 auto}
-.stage.v{aspect-ratio:9/16;width:min(100%,calc(78vh * 9 / 16))}
+.stage{position:relative;background:#000;border-radius:0 0 12px 12px;overflow:hidden;width:min(100%,calc(78vh * 9 / 16));aspect-ratio:9/16;margin:0 auto}
+.stage.h{aspect-ratio:16/9;width:100%}
 .stage:fullscreen,.stage.fs{width:100vw!important;height:100vh!important;max-height:none!important;aspect-ratio:auto!important;border-radius:0}
 .stage.fs{position:fixed;inset:0;z-index:999}
 #player{position:absolute;inset:0;width:100%;height:100%}
@@ -78,7 +78,7 @@ body.clean .ctrl,body.clean #items,body.clean #banner{display:none!important}
 .it .tt{flex:1;font-size:14px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
 .chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
-#unmute{position:absolute;left:8px;bottom:56px;z-index:9;background:#000b;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:14px}
+#btnMute.off{background:var(--acc);border-color:var(--acc);color:#fff}
 #dayPop{position:absolute;top:10px;left:50%;transform:translate(-50%,-14px);background:var(--ok);color:#06220f;font-weight:700;font-size:15px;line-height:1.2;padding:8px 16px;border-radius:14px;z-index:8;pointer-events:none;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 4px 14px #0007;max-width:92%}
 #dayPop.show{opacity:1;transform:translate(-50%,0)}
 .seekrow{display:flex;align-items:center;gap:6px;margin:10px 0 0}
@@ -148,7 +148,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="unmute" style="display:none">🔇 Sesi aç</button></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div></div>
   <div class="seekrow">
     <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
     <span class="tm" id="tCur">0:00</span>
@@ -159,6 +159,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   <div id="banner"></div>
   <div class="ctrl">
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
+    <button class="btn" id="btnMute" title="Sesi aç/kapat">🔊</button>
     <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
     <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
   </div>
@@ -250,7 +251,7 @@ function migrate(s){
   s.ccOn=!!s.ccOn;
   s.lists.forEach(l=>{
     l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};l.liked=l.liked||{};
-    if(l.cc===undefined)l.cc=!!s.ccOn;l.fs=!!l.fs;
+    if(l.cc===undefined)l.cc=!!s.ccOn;l.fs=!!l.fs;if(typeof l.vertical!=='boolean')l.vertical=true;
     l.kind=l.kind||'playlist';l.index=l.index||0;l.time=l.time||0;l.watchSec=l.watchSec||0;
     if(!l.vid&&l.ids[l.index])l.vid=l.ids[l.index];
   });
@@ -394,7 +395,7 @@ async function addList(){
     const r=await resolveInput(txt);
     if(!r){alert('Bu link tanınmadı. Oynatma listesi (list=…), Shorts/video veya kanal (@isim) linki girin.');return}
     if(S.lists.some(l=>l.listId===r.listId)){alert('Bu liste zaten ekli.');return}
-    const l={id:'l'+Date.now().toString(36),kind:r.kind,listId:r.listId,name:r.name||('Liste '+(S.lists.length+1)),index:0,time:0,vid:null,ids:[],titles:{},watched:{},liked:{},watchSec:0,lastAt:0,fetchedAt:0,vertical:r.kind==='shorts',startVid:r.startVid||null};
+    const l={id:'l'+Date.now().toString(36),kind:r.kind,listId:r.listId,name:r.name||('Liste '+(S.lists.length+1)),index:0,time:0,vid:null,ids:[],titles:{},watched:{},liked:{},watchSec:0,lastAt:0,fetchedAt:0,vertical:true,startVid:r.startVid||null};
     S.lists.push(l);if(!S.defaultId)S.defaultId=l.id;save();$('urlIn').value='';renderHome();
     if(S.apiKey){
       try{await refreshIds(l)}catch(e){alert('Liste bilgileri alınamadı: '+e.message)}
@@ -582,7 +583,7 @@ $('items').addEventListener('click',e=>{
   if(e.target.closest('[data-c]')){markWatched(v,!cur.watched[v]);return}
   playIndex(i);
 });
-function applyShape(){$('stage').classList.toggle('v',!!(cur&&cur.vertical))}
+function applyShape(){$('stage').classList.toggle('h',!!(cur&&cur.vertical===false))}
 async function doRefresh(){
   if(!cur)return;
   if(!S.apiKey){showBanner("Listeyi yenilemek için Ayarlar'dan API anahtarı girin (ana ekran → ⚙ Ayarlar).");return}
@@ -706,7 +707,7 @@ function toggleFs(){
   if(f){
     try{
       const p=f.call(stage);
-      const lock=()=>{try{screen.orientation.lock(cur&&cur.vertical?'portrait':'landscape').catch(()=>{})}catch(e){}};
+      const lock=()=>{try{screen.orientation.lock(cur&&cur.vertical!==false?'portrait':'landscape').catch(()=>{})}catch(e){}};
       if(p&&p.then)p.then(lock).catch(fallback);else lock();
     }catch(e){fallback()}
   }else fallback();
@@ -752,18 +753,30 @@ setInterval(()=>{
 /* ---------- OTOMATİK OYNATMA ---------- */
 // Tarayıcı sesli otomatik oynatmayı engellerse sessiz başlat; ilk dokunuşta sesi aç
 let autoMuted=false;
-function setAutoMuted(v){autoMuted=v;$('unmute').style.display=v?'block':'none'}
+function isMuted(){try{return !!player.isMuted()}catch(e){return false}}
+function updateMuteUI(){
+  const m=isMuted(),b=$('btnMute');
+  b.textContent=m?'🔇':'🔊';b.classList.toggle('off',m);
+  b.title=m?'Sesi aç':'Sesi kapat';
+}
+function setAutoMuted(v){autoMuted=v;updateMuteUI()}
 function doUnmute(){
   try{player.unMute();player.setVolume(100)}catch(e){}
-  setAutoMuted(false);toast('🔊');
+  autoMuted=false;updateMuteUI();toast('🔊');
 }
+function toggleMute(){
+  if(!playerReady)return;
+  if(isMuted())doUnmute();
+  else{try{player.mute()}catch(e){}autoMuted=false;updateMuteUI();toast('🔇')}
+}
+$('btnMute').onclick=toggleMute;
+setInterval(()=>{if(playerReady&&cur)updateMuteUI()},1000);
 function ensureAutoplay(l){
   setTimeout(()=>{
     if(cur!==l||loadedOk||!playerReady)return;
     try{player.mute();player.playVideo();setAutoMuted(true)}catch(e){}
   },1500);
 }
-$('unmute').onclick=doUnmute;
 
 /* ---------- GÜNLÜK SAYAÇ ---------- */
 let countedLoad=false,popT;
@@ -833,7 +846,7 @@ $('cleanExit').onclick=()=>setClean(false);
 const sheet=$('sheet'),sbody=$('sheetBody');
 function updateSheetVals(){
   $('valCC').textContent=(cur&&cur.cc)?'Açık':'Kapalı';
-  $('valShape').textContent=cur&&cur.vertical?'Dikey (9:16)':'Yatay (16:9)';
+  $('valShape').textContent=cur&&cur.vertical!==false?'Dikey (9:16)':'Yatay (16:9)';
 }
 function showSheetMain(){$('sheetDesc').style.display='none';$('sheetMain').style.display='block';sbody.scrollTop=0}
 function openSheet(){
