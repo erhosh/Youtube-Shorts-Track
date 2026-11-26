@@ -580,8 +580,8 @@ function begin(l){
 function playIndex(i){
   if(!cur||!playerReady||i<0||i>=cur.ids.length)return false;
   cur.index=i;cur.vid=cur.ids[i];cur.time=0;cur.lastAt=Date.now();save();
-  loadReset();updateSwipe();
-  try{player.loadVideoById({videoId:cur.vid})}catch(e){}
+  loadReset();updateSwipe();seekFixFor=cur.vid;
+  try{player.loadVideoById({videoId:cur.vid,startSeconds:0})}catch(e){}
   highlight();
   return true;
 }
@@ -608,18 +608,17 @@ function onState(e){
   }
   else if(s===2)saveProgress();
 }
-// Her videonun ilk oynatılışında ses hattını hemen canlandır: oynatıcı "sesi açık" gösterip
-// ilk ~2 sn sessiz kalabiliyor. Kullanıcı sesi kapattıysa (🔇) ya da otomatik sessiz başladıysa dokunulmaz.
-let kickFor=null,dbgFor=null;
+// Kaydırarak açılan videoda (loadVideoById) YouTube ses hattı ilk ~2 sn gecikmeli başlıyor; aynı video
+// başa sarılınca ses sorunsuz. Bu yüzden ilk oynatmada hemen başa (0 sn) bir kez sarıyoruz.
+let seekFixFor=null,dbgFor=null;
 function kickAudio(){
-  if(!cur||kickFor===cur.vid)return;
-  kickFor=cur.vid;
-  const id=cur.vid;
-  const go=()=>{
-    if(!cur||cur.vid!==id||autoMuted||isMuted())return;
-    try{player.setVolume(100);player.unMute()}catch(e){}
-  };
-  go();[250,700,1400].forEach(ms=>setTimeout(go,ms));
+  if(!cur||seekFixFor!==cur.vid)return;
+  seekFixFor=null;
+  try{
+    const t=player.getCurrentTime();
+    dbg('seekFix pos='+t.toFixed(2));
+    if(t<2){player.seekTo(0,true);afterSeek()}
+  }catch(e){}
 }
 function curVid(){try{const d=player.getVideoData();return d&&d.video_id}catch(e){return null}}
 function recordVideo(){
