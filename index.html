@@ -206,6 +206,8 @@ header h1{display:flex;align-items:center}
 #spReset{width:44px;height:44px;padding:0;border-radius:50%;font-size:12px;font-weight:700}
 #toast{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;background:var(--glass),rgba(10,12,16,.5);border:1.5px solid rgba(255,255,255,.4);box-shadow:inset 0 0 12px rgba(255,255,255,.2),0 4px 16px rgba(0,0,0,.5);backdrop-filter:blur(4px);text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #toast svg.i{width:22px;height:22px}
+#toast.rnd{width:64px;height:64px;padding:0;gap:0;justify-content:center;border-radius:50%}
+#toast.rnd svg.i{width:28px;height:28px}
 #dayPop{background:var(--glassG),#1f7a54;color:#fff;border:1.5px solid rgba(170,255,215,.6);box-shadow:inset 0 0 10px rgba(255,255,255,.25),0 4px 14px #0007;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 #undoBar{background:var(--glass),rgba(30,34,44,.92);border:1.5px solid rgba(255,255,255,.35);border-radius:999px;padding-left:18px}
 #undoBar .btn{color:#f2fff8}
@@ -801,7 +803,7 @@ window.addEventListener('popstate',()=>{
 /* ---------- KAYDIRMA + TAM EKRAN ---------- */
 const stage=$('stage'),gest=$('gesture'),toastEl=$('toast');
 let toastT;
-function toast(t,i){toastEl.innerHTML=(i?ic(i):'')+(t?'<span>'+esc(t)+'</span>':'');toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
+function toast(t,i){toastEl.innerHTML=(i?ic(i):'')+(t?'<span>'+esc(t)+'</span>':'');toastEl.classList.toggle('rnd',!t&&!!i);toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
 function go(dir){
   if(!cur)return;
   // Kaydırarak geçişte videonun %70'inden fazlası izlendiyse izlenmiş say ve tikle
