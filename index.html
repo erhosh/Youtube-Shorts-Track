@@ -164,11 +164,15 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 #notesList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 #btnSpeed.on{background:var(--star);border-color:var(--star);color:#1a1300}
 .ctrl{gap:8px}
-#speedStrip{display:none;position:absolute;left:36px;right:36px;bottom:36px;height:48px;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:space-between;padding:0 14px;border-radius:24px;background:rgba(42,47,58,.35);border:1px solid rgba(139,147,165,.25);color:rgba(232,234,240,.45);font-size:13px;-webkit-tap-highlight-color:transparent}
+#speedStrip{display:none;position:absolute;left:50%;bottom:36px;width:58px;height:58px;border-radius:50%;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);-webkit-tap-highlight-color:transparent;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.6),rgba(255,255,255,.16) 36%,rgba(110,165,255,.18) 70%,rgba(255,255,255,.08));border:1.5px solid rgba(255,255,255,.45);box-shadow:inset 0 0 12px rgba(255,255,255,.28),0 4px 14px rgba(0,0,0,.45);transform:translate(calc(-50% + var(--kx,0px)),0) scale(var(--ks,1));transition:transform .7s cubic-bezier(.3,1.9,.45,1),border-color .2s,opacity .4s ease}
+#speedStrip.dim{opacity:.2}
+#speedStrip::after{content:"";position:absolute;left:13px;top:8px;width:14px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transform:rotate(-30deg);pointer-events:none}
 .stage:fullscreen #speedStrip,.stage.fs #speedStrip{display:flex}
-#speedStrip.act{background:rgba(42,47,58,.55);border-color:rgba(62,207,142,.5)}
-#speedKnob{position:absolute;left:50%;top:50%;width:42px;height:42px;border-radius:50%;background:rgba(232,234,240,.2);border:1.5px solid rgba(232,234,240,.55);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;transform:translate(calc(-50% + var(--kx,0px)),-50%) scale(var(--ks,1));transition:transform .7s cubic-bezier(.3,1.9,.45,1),background .2s,border-color .2s}
-#speedStrip.act #speedKnob{transition:none;background:rgba(62,207,142,.35);border-color:var(--ok)}
+#speedStrip.act{transition:border-color .2s,opacity .4s ease;border-color:var(--ok)}
+#fsProg{display:none;position:absolute;left:36px;right:36px;bottom:16px;height:2px;border-radius:1px;background:rgba(255,255,255,.22);pointer-events:none;z-index:6}
+.stage:fullscreen #fsProg,.stage.fs #fsProg{display:block}
+#fsFill{position:absolute;left:0;top:0;height:100%;width:0;border-radius:1px;background:rgba(62,207,142,.55)}
+#fsDot{position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);transform:translate(-50%,-50%)}
 </style>
 </head>
 <body>
@@ -199,7 +203,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip"><span>◀</span><span id="speedKnob">1×</span><span>▶</span></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip"><span id="speedKnob">1×</span></div><div id="fsProg"><i id="fsFill"></i><b id="fsDot"></b></div></div>
   <div class="seekrow">
     <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
     <span class="tm" id="tCur">0:00</span>
@@ -219,7 +223,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   </div>
   <div class="seekrow" id="speedPanel" style="display:none">
     <span class="tm" id="spLbl">1×</span>
-    <input type="range" id="spRange" min="0" max="7" value="3" step="1" aria-label="Oynatma hızı">
+    <input type="range" id="spRange" min="5" max="20" value="10" step="1" aria-label="Oynatma hızı">
     <button class="btn" id="spReset" title="Hızı 1× yap">1×</button>
   </div>
   <div class="listhead"><span>Videolar</span><button class="btn" id="btnResetWatched">☑ Tüm izlenenleri sıfırla</button></div>
@@ -617,6 +621,7 @@ function markWatched(id,v){
   if(!cur||!id)return;
   if(v)cur.watched[id]=1;else delete cur.watched[id];
   save();setRowWatched(id);
+  if(v)countVideo(id,cur); // izlendi tiki (otomatik veya elle) günlük sayaca da yansır
 }
 function saveProgress(ended){
   if(!cur||!playerReady||!loadedOk)return;
@@ -825,6 +830,7 @@ let wasFs=false;
 function updFs(){
   const now=isFs();
   if(wasFs&&!now)fsExitAt=Date.now();
+  if(now&&!wasFs)wakeBubble(false);
   if(now!==wasFs&&cur&&!leaving&&cur.fs!==now){cur.fs=now;save()}
   wasFs=now;
   if(!now){try{screen.orientation.unlock()}catch(e){}}
@@ -881,6 +887,8 @@ setInterval(()=>{
     const d=player.getDuration(),t=player.getCurrentTime();
     if(d>0){seekEl.value=Math.round(t/d*1000);tCur.textContent=fmtT(t);tDur.textContent=fmtT(d)}
     else{seekEl.value=0;tCur.textContent='0:00';tDur.textContent='0:00'}
+    const pc=d>0?Math.max(0,Math.min(100,t/d*100)):0;
+    $('fsFill').style.width=pc+'%';$('fsDot').style.left=pc+'%';
   }catch(e){}
 },300);
 
@@ -913,55 +921,63 @@ function ensureAutoplay(l){
 }
 
 /* ---------- OYNATMA HIZI ---------- */
-const DEF_RATES=[0.25,0.5,0.75,1,1.25,1.5,1.75,2];
-function ratesList(){let a=null;try{a=player.getAvailablePlaybackRates()}catch(e){}return(a&&a.length)?a:DEF_RATES}
-function rateIdx(a,r){let bi=0,bd=99;a.forEach((x,i)=>{const d=Math.abs(x-r);if(d<bd){bd=d;bi=i}});return bi}
-function fmtRate(r){return(Math.round(r*100)/100)+'×'}
+// 0.5× – 2.0× arası 0.1'lik adımlar
+function clampRate(r){return Math.max(0.5,Math.min(2,Math.round(r*10)/10))}
+function fmtRate(r){return(Math.round(r*10)/10)+'×'}
 function updSpeedUI(){
-  const a=ratesList(),r=S.rate||1;
+  const r=S.rate||1;
   $('spBtnTx').textContent=fmtRate(r);$('speedKnob').textContent=fmtRate(r);
-  $('btnSpeed').classList.toggle('on',r!==1);
-  const rg=$('spRange');rg.max=a.length-1;rg.value=rateIdx(a,r);
+  $('btnSpeed').classList.toggle('on',Math.abs(r-1)>0.001);
+  $('spRange').value=Math.round(r*10);
   $('spLbl').textContent=fmtRate(r);
 }
 function setRate(r,quiet){
-  const a=ratesList();r=a[rateIdx(a,r)];
+  r=clampRate(r);
   S.rate=r;saveQuiet();
   try{if(playerReady)player.setPlaybackRate(r)}catch(e){}
   updSpeedUI();
   if(!quiet)toast('⚡ '+fmtRate(r));
 }
-function applyRate(){try{if(S.rate&&player.getPlaybackRate()!==S.rate)player.setPlaybackRate(S.rate)}catch(e){}}
-$('btnSpeed').onclick=()=>{const p=$('speedPanel');p.style.display=p.style.display==='none'?'flex':'none';updSpeedUI()};
-$('spRange').addEventListener('input',e=>{const a=ratesList();setRate(a[+e.target.value],true)});
-$('spReset').onclick=()=>setRate(1);
-// Tam ekranda: yuvarlak düğmeyi sağa/sola sürükleyerek hız ayarı; bırakınca yay gibi ortaya geri döner
-// (şerit alt kenardan 36 px yukarıda, yan kenarlardan 36 px içeride: sistem jestleri tetiklenmez)
-const strip=$('speedStrip'),knob=$('speedKnob');let sg=null;
-function kx(dx){
-  const max=Math.max(30,strip.clientWidth/2-30);
-  return max*Math.tanh(dx/max*0.9); // sınıra yaklaştıkça direnç (lastik etkisi)
+let lastRateTry=0;
+function applyRate(){
+  try{
+    if(!S.rate||Math.abs(player.getPlaybackRate()-S.rate)<0.01)return;
+    const n=Date.now();if(n-lastRateTry<300)return;lastRateTry=n; // YouTube değeri yuvarlarsa döngüye girme
+    player.setPlaybackRate(S.rate);
+  }catch(e){}
 }
-strip.addEventListener('pointerdown',e=>{
-  sg={x:e.clientX,i:rateIdx(ratesList(),S.rate||1)};
-  strip.classList.add('act');knob.style.setProperty('--ks','1.15');
-  try{strip.setPointerCapture(e.pointerId)}catch(x){}
+$('btnSpeed').onclick=()=>{const p=$('speedPanel');p.style.display=p.style.display==='none'?'flex':'none';updSpeedUI()};
+$('spRange').addEventListener('input',e=>setRate(+e.target.value/10,true));
+$('spReset').onclick=()=>setRate(1);
+// Tam ekranda: baloncuğu sağa/sola sürükleyerek hız ayarı; bırakınca yay gibi ortaya geri döner
+// (alt kenardan 36 px yukarıda ve ortada: sistem gezinme/geri jestleri tetiklenmez)
+const bub=$('speedStrip');let sg=null,dimT=null;
+// Hareketsizlikte baloncuk %80 şeffaflaşır; dokununca hemen belirginleşir
+function wakeBubble(hold){bub.classList.remove('dim');clearTimeout(dimT);dimT=null;if(!hold)dimT=setTimeout(()=>{if(!sg)bub.classList.add('dim')},2800)}
+function kx(dx){
+  const max=Math.max(40,stage.clientWidth/2-50);
+  return max*Math.tanh(dx/max*0.9); // sınıra yaklaştıkça direnç
+}
+bub.addEventListener('pointerdown',e=>{
+  sg={x:e.clientX,r:S.rate||1};
+  wakeBubble(true);
+  bub.classList.add('act');bub.style.setProperty('--ks','1.15');
+  try{bub.setPointerCapture(e.pointerId)}catch(x){}
   e.preventDefault();
 });
-strip.addEventListener('pointermove',e=>{
+bub.addEventListener('pointermove',e=>{
   if(!sg)return;
-  const dx=e.clientX-sg.x,a=ratesList();
-  knob.style.setProperty('--kx',kx(dx)+'px');
-  const i=Math.max(0,Math.min(a.length-1,sg.i+Math.round(dx/36)));
-  if(a[i]!==(S.rate||1))setRate(a[i]);
+  const dx=e.clientX-sg.x;
+  bub.style.setProperty('--kx',kx(dx)+'px');
+  const r=clampRate(sg.r+Math.round(dx/22)/10); // her ~22 px = 0.1
+  if(Math.abs(r-(S.rate||1))>0.001)setRate(r,true);
 });
 const endSg=()=>{
   if(!sg)return;sg=null;
-  strip.classList.remove('act');
-  // sınıf kalkınca geçiş (yaylı geri dönüş) devreye girer
-  knob.style.setProperty('--kx','0px');knob.style.setProperty('--ks','1');
+  bub.classList.remove('act');wakeBubble(false);
+  bub.style.setProperty('--kx','0px');bub.style.setProperty('--ks','1');
 };
-strip.addEventListener('pointerup',endSg);strip.addEventListener('pointercancel',endSg);
+bub.addEventListener('pointerup',endSg);bub.addEventListener('pointercancel',endSg);
 
 /* ---------- GÜNLÜK SAYAÇ ---------- */
 let countedLoad=false,popT;
@@ -976,13 +992,17 @@ function showDayPop(n){
   p.classList.add('show');clearTimeout(popT);popT=setTimeout(()=>p.classList.remove('show'),3500);
 }
 // Bir video bitince ya da %90'ına gelince bir kez sayılır; her 5. videoda bilgi kutusu çıkar
+function countVideo(id,l){
+  if(!id||!l||seenToday(id))return false; // aynı gün aynı video bir kez sayılır
+  const d=dayOf(l);d.vids.push(id);d.n++;save();
+  const n=todayTotal();
+  if(n%5===0)showDayPop(n); // 5, 10, 15 ... tekil videoda hemen göster
+  return true;
+}
 function countWatch(){
   if(countedLoad||!cur||!cur.vid)return;
   countedLoad=true;
-  if(seenToday(cur.vid))return; // tekrar izleme sayılmaz
-  const d=dayOf(cur);d.vids.push(cur.vid);d.n++;save();
-  const n=todayTotal();
-  if(n%5===0)showDayPop(n); // her 5 tekil videonun 5.'sinin %90'ında
+  countVideo(cur.vid,cur);
 }
 
 /* ---------- ALTYAZI (CC) ---------- */
