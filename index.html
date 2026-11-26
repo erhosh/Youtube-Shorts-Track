@@ -578,6 +578,7 @@ function onState(e){
   const s=e.data;
   if(s===1){
     loadedOk=true;hideBanner();recordVideo();
+    kickAudio();
     if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
     else if(!cur.cc)enforceCCOff();
   }
@@ -586,6 +587,19 @@ function onState(e){
     if(!playIndex(cur.index+1)){cur.time=0;save()}
   }
   else if(s===2)saveProgress();
+}
+// Her videonun ilk oynatılışında ses hattını hemen canlandır: oynatıcı "sesi açık" gösterip
+// ilk ~2 sn sessiz kalabiliyor. Kullanıcı sesi kapattıysa (🔇) ya da otomatik sessiz başladıysa dokunulmaz.
+let kickFor=null;
+function kickAudio(){
+  if(!cur||kickFor===cur.vid)return;
+  kickFor=cur.vid;
+  const id=cur.vid;
+  const go=()=>{
+    if(!cur||cur.vid!==id||autoMuted||isMuted())return;
+    try{player.setVolume(100);player.unMute()}catch(e){}
+  };
+  go();[250,700,1400].forEach(ms=>setTimeout(go,ms));
 }
 function curVid(){try{const d=player.getVideoData();return d&&d.video_id}catch(e){return null}}
 function recordVideo(){
