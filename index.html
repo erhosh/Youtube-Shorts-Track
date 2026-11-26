@@ -164,15 +164,51 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 #notesList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 #btnSpeed.on{background:var(--star);border-color:var(--star);color:#1a1300}
 .ctrl{gap:8px}
-#speedStrip{display:none;position:absolute;left:50%;bottom:36px;width:58px;height:58px;border-radius:50%;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);-webkit-tap-highlight-color:transparent;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.6),rgba(255,255,255,.16) 36%,rgba(110,165,255,.18) 70%,rgba(255,255,255,.08));border:1.5px solid rgba(255,255,255,.45);box-shadow:inset 0 0 12px rgba(255,255,255,.28),0 4px 14px rgba(0,0,0,.45);transform:translate(calc(-50% + var(--kx,0px)),0) scale(var(--ks,1));transition:transform .7s cubic-bezier(.3,1.9,.45,1),border-color .2s,opacity .4s ease}
+#speedStrip{display:none;position:absolute;left:50%;bottom:38px;width:46px;height:46px;border-radius:50%;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);-webkit-tap-highlight-color:transparent;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.6),rgba(255,255,255,.16) 36%,rgba(110,165,255,.18) 70%,rgba(255,255,255,.08));border:1.5px solid rgba(255,255,255,.45);box-shadow:inset 0 0 12px rgba(255,255,255,.28),0 4px 14px rgba(0,0,0,.45);transform:translate(calc(-50% + var(--kx,0px)),0) scale(var(--ks,1));transition:transform .7s cubic-bezier(.3,1.9,.45,1),border-color .2s,opacity .4s ease}
 #speedStrip.dim{opacity:.2}
-#speedStrip::after{content:"";position:absolute;left:13px;top:8px;width:14px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transform:rotate(-30deg);pointer-events:none}
 .stage:fullscreen #speedStrip,.stage.fs #speedStrip{display:flex}
 #speedStrip.act{transition:border-color .2s,opacity .4s ease;border-color:var(--ok)}
 #fsProg{display:none;position:absolute;left:36px;right:36px;bottom:16px;height:2px;border-radius:1px;background:rgba(255,255,255,.22);pointer-events:none;z-index:6}
 .stage:fullscreen #fsProg,.stage.fs #fsProg{display:block}
 #fsFill{position:absolute;left:0;top:0;height:100%;width:0;border-radius:1px;background:rgba(62,207,142,.55)}
 #fsDot{position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);transform:translate(-50%,-50%)}
+
+/* ===== Baloncuk (cam) teması ===== */
+:root{--glass:radial-gradient(circle at 30% 26%,rgba(255,255,255,.5),rgba(255,255,255,.14) 36%,rgba(110,165,255,.16) 70%,rgba(255,255,255,.07));--glassG:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55),rgba(62,207,142,.5) 40%,rgba(62,207,142,.32) 75%,rgba(255,255,255,.1));--glassY:radial-gradient(circle at 30% 26%,rgba(255,255,255,.55),rgba(255,200,61,.5) 40%,rgba(255,200,61,.3) 75%,rgba(255,255,255,.1));--glassR:radial-gradient(circle at 30% 26%,rgba(255,255,255,.5),rgba(255,77,77,.5) 40%,rgba(255,77,77,.3) 75%,rgba(255,255,255,.1))}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn,.ico,.chk,#noteFab,#cleanExit{background:var(--glass);border:1.5px solid rgba(255,255,255,.4);box-shadow:inset 0 0 10px rgba(255,255,255,.22),0 3px 10px rgba(0,0,0,.35);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);overflow:hidden}
+.btn,.ico,.chk{position:relative}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px}
+.btn:hover{border-color:rgba(255,255,255,.7)}
+.btn.pri{background:var(--glassG);border-color:rgba(170,255,215,.65);color:#f2fff8}
+.ico{backdrop-filter:blur(3px)}
+.ico.on{background:var(--glassY);color:#fff0b8}
+.chk{color:transparent}
+.chk.on{background:var(--glassG);border-color:rgba(170,255,215,.7);color:#fff}
+#noteFab{background:var(--glassY);color:#fff}
+#noteFab svg.i{width:22px;height:22px}
+.ico svg.i{width:18px;height:18px}
+.logo{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;margin-right:10px;vertical-align:middle;background:var(--glassG);border:1.5px solid rgba(170,255,215,.6);box-shadow:inset 0 0 8px rgba(255,255,255,.3);color:#fff}
+.logo svg.i{width:14px;height:14px}
+header h1{display:flex;align-items:center}
+.cstats svg.i{vertical-align:-2px;margin-right:3px}
+.ni .na button svg.i{width:16px;height:16px}
+.dh button svg.i{width:22px;height:22px}
+.ctrl{justify-content:space-between;gap:6px}
+.ctrl .btn{flex:none;width:42px;height:42px;padding:0;border-radius:50%;font-size:15px}
+.ctrl .cc{font-size:11px;border-width:1.5px;padding:0 3px;line-height:14px}
+#btnCC.on,#btnNoteNotify.on{background:var(--glassG);border-color:rgba(170,255,215,.7);color:#fff}
+#btnSpeed.on{background:var(--glassY);border-color:rgba(255,230,150,.7);color:#fff}
+#btnMute.off{background:var(--glassR);border-color:rgba(255,170,170,.7);color:#fff}
+.seekrow .btn.sk{width:44px;height:44px;padding:0;border-radius:50%;flex-direction:column;gap:0;font-size:10px;line-height:1}
+.seekrow .btn.sk svg.i{width:16px;height:16px}
+.seekrow .btn.sk b{font-size:10px;font-weight:700}
+#spReset{width:44px;height:44px;padding:0;border-radius:50%;font-size:12px;font-weight:700}
+#toast{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;background:var(--glass),rgba(10,12,16,.5);border:1.5px solid rgba(255,255,255,.4);box-shadow:inset 0 0 12px rgba(255,255,255,.2),0 4px 16px rgba(0,0,0,.5);backdrop-filter:blur(4px);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#toast svg.i{width:22px;height:22px}
+#dayPop{background:var(--glassG),#1f7a54;color:#fff;border:1.5px solid rgba(170,255,215,.6);box-shadow:inset 0 0 10px rgba(255,255,255,.25),0 4px 14px #0007;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+#undoBar{background:var(--glass),rgba(30,34,44,.92);border:1.5px solid rgba(255,255,255,.35);border-radius:999px;padding-left:18px}
+#undoBar .btn{color:#f2fff8}
 </style>
 </head>
 <body>
@@ -181,10 +217,10 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 <!-- ANA EKRAN -->
 <div id="view-home">
   <header>
-    <h1>▶ ShortRest</h1>
-    <button class="btn" id="btnNotes">📝 Notlar</button>
-    <button class="btn" id="btnInstall" style="display:none">⬇ Yükle</button>
-    <button class="btn" id="btnSettings">⚙ Ayarlar</button>
+    <h1><span class="logo" data-ic="play"></span>ShortRest</h1>
+    <button class="btn" id="btnNotes" data-ic="note"> Notlar</button>
+    <button class="btn" id="btnInstall" style="display:none" data-ic="download"> Yükle</button>
+    <button class="btn" id="btnSettings" data-ic="sliders"> Ayarlar</button>
   </header>
   <div class="notice" id="fileNotice" style="display:none">
     Bu sayfa <code>file://</code> veya <code>content://</code> ile açıldı. YouTube bu durumda videoyu "Hata 153" ile reddeder. Sayfayı bir web adresinden (https://…) açın.
@@ -196,37 +232,37 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   </div>
   <div class="hint">
     Eklenebilir: oynatma listesi linki · bir Shorts videosunun linki (kanalın tüm Shorts'ları o videodan itibaren oynar) · kanal linki (@isim).
-    200'den uzun listeler ve Shorts için Ayarlar'dan YouTube API anahtarı girin. ⭐ ile işaretli liste açılışta kaldığınız yerden devam eder.
+    200'den uzun listeler ve Shorts için Ayarlar'dan YouTube API anahtarı girin. Yıldızla işaretli liste açılışta kaldığınız yerden devam eder.
   </div>
   <div class="grid" id="grid"></div>
 </div>
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip"><span id="speedKnob">1×</span></div><div id="fsProg"><i id="fsFill"></i><b id="fsDot"></b></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster" data-ic="note"></button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip"><span id="speedKnob">1×</span></div><div id="fsProg"><i id="fsFill"></i><b id="fsDot"></b></div></div>
   <div class="seekrow">
-    <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
+    <button class="btn sk" id="btnSeekB" title="10 sn geri" data-ic="rew"><b>10</b></button>
     <span class="tm" id="tCur">0:00</span>
     <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Videoyu ileri geri sar">
     <span class="tm" id="tDur">0:00</span>
-    <button class="btn" id="btnSeekF" title="10 sn ileri">10 ⏩</button>
+    <button class="btn sk" id="btnSeekF" title="10 sn ileri" data-ic="fwd"><b>10</b></button>
   </div>
   <div id="banner"></div>
   <div class="ctrl">
-    <button class="btn" id="btnNoteNotify" title="Not bildirimleri: kayıtlı not saniyesinde simge göster">🔔</button>
+    <button class="btn" id="btnNoteNotify" title="Not bildirimleri: kayıtlı not saniyesinde simge göster" data-ic="bell"></button>
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
     <button class="btn" id="btnSpeed" title="Oynatma hızı"><span id="spBtnTx" style="font-size:15px;font-weight:700">1×</span></button>
-    <button class="btn" id="btnMute" title="Sesi aç/kapat">🔊</button>
-    <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
-    <button class="btn" id="btnHome" title="Ana ekran">🏠</button>
-    <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
+    <button class="btn" id="btnMute" title="Sesi aç/kapat" data-ic="vol"></button>
+    <button class="btn" id="btnFs" title="Tam ekran" data-ic="full"></button>
+    <button class="btn" id="btnHome" title="Ana ekran" data-ic="home"></button>
+    <button class="btn" id="btnMore" title="Seçenekler" data-ic="more"></button>
   </div>
   <div class="seekrow" id="speedPanel" style="display:none">
     <span class="tm" id="spLbl">1×</span>
     <input type="range" id="spRange" min="5" max="20" value="10" step="1" aria-label="Oynatma hızı">
     <button class="btn" id="spReset" title="Hızı 1× yap">1×</button>
   </div>
-  <div class="listhead"><span>Videolar</span><button class="btn" id="btnResetWatched">☑ Tüm izlenenleri sıfırla</button></div>
+  <div class="listhead"><span>Videolar</span><button class="btn" id="btnResetWatched" data-ic="check"> Tüm izlenenleri sıfırla</button></div>
   <div class="items" id="items"></div>
 </div>
 
@@ -246,7 +282,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
       <button class="srow" data-s="yt"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span class="lbl">YouTube'da aç</span></button>
     </div>
     <div id="sheetDesc">
-      <div class="dh"><button id="descBack" aria-label="Geri">←</button><span>Açıklama</span></div>
+      <div class="dh"><button id="descBack" aria-label="Geri" data-ic="back"></button><span>Açıklama</span></div>
       <h3 id="descTitle"></h3>
       <p id="descCh"></p>
       <div id="descTxt"></div>
@@ -257,7 +293,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 <div id="undoBar"><span>İzlenme işaretleri kaldırıldı —</span><button class="btn" id="btnUndo">Geri Al</button></div>
 
 <dialog id="dlgNotes">
-  <h3 style="margin:0">📝 Notlar</h3>
+  <h3 style="margin:0;display:flex;align-items:center;gap:8px" data-ic="note"> Notlar</h3>
   <div id="notesList"></div>
   <div class="row" style="justify-content:flex-end"><button class="btn" id="btnCloseNotes">Kapat</button></div>
 </dialog>
@@ -273,7 +309,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
     <input type="file" id="fileImport" accept=".json" style="display:none">
   </div>
   <div class="row">
-    <button class="btn" id="btnPickDir">📁 Yedek klasörü seç</button>
+    <button class="btn" id="btnPickDir" data-ic="folder"> Yedek klasörü seç</button>
     <button class="btn" id="btnClearDir" style="display:none">Klasörü kaldır</button>
   </div>
   <p id="dirInfo"></p>
@@ -296,8 +332,8 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
       <label>Eşleşme kodu</label>
       <div id="syncCodeShow"></div>
       <div class="row">
-        <button class="btn" id="btnSyncPush">⬆ Buluta yükle</button>
-        <button class="btn" id="btnSyncPull">⬇ Buluttan indir</button>
+        <button class="btn" id="btnSyncPush" data-ic="up"> Buluta yükle</button>
+        <button class="btn" id="btnSyncPull" data-ic="download"> Buluttan indir</button>
       </div>
       <div class="row">
         <button class="btn" id="btnSyncAuto">Otomatik senkron: Kapalı</button>
@@ -344,6 +380,35 @@ function migrate(s){
 function load(){let s=null;try{s=JSON.parse(localStorage.getItem(LS))}catch(e){}return migrate(s)}
 function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}onLocalChange()}
 const $=id=>document.getElementById(id);
+const IC={
+play:'<path d="M8 5v14l11-7z" fill="currentColor"/>',
+pause:'<rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/>',
+fwd:'<path d="M13 6l7 6-7 6zM4 6l7 6-7 6z" fill="currentColor"/>',
+rew:'<path d="M11 6l-7 6 7 6zM20 6l-7 6 7 6z" fill="currentColor"/>',
+vol:'<path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+mute:'<path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M17 9l5 6M22 9l-5 6"/>',
+bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+full:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>',
+more:'<circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/>',
+note:'<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 13h8M8 17h6"/>',
+sliders:'<path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/>',
+download:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+up:'<path d="M12 20V9M7 13l5-5 5 5M5 4h14"/>',
+check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+folder:'<path d="M3 6h6l2 2h10v11H3z"/>',
+star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+starf:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="currentColor"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13M10 11v6M14 11v6"/>',
+bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+up2:'<path d="M6 15l6-6 6 6"/>',
+down2:'<path d="M6 9l6 6 6-6"/>',
+clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6"/>'
+};
+function ic(n,sz){return '<svg class="i" viewBox="0 0 24 24"'+(sz?' style="width:'+sz+'px;height:'+sz+'px"':'')+'>'+(IC[n]||'')+'</svg>'}
+document.querySelectorAll('[data-ic]').forEach(el=>el.insertAdjacentHTML('afterbegin',ic(el.dataset.ic)));
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmt(sec){sec=Math.floor(sec||0);if(sec<60)return sec+' sn';const m=Math.floor(sec/60);if(m<60)return m+' dk';const h=Math.floor(m/60);return h+' sa '+(m%60)+' dk'}
 function ago(ts){if(!ts)return 'henüz izlenmedi';const d=Math.floor((Date.now()-ts)/60000);if(d<1)return 'az önce';if(d<60)return d+' dk önce';const h=Math.floor(d/60);if(h<24)return h+' sa önce';return Math.floor(h/24)+' gün önce'}
@@ -439,10 +504,10 @@ function renderHome(){
     return `<div class="card ${S.defaultId===l.id?'def':''}" data-id="${l.id}">
       <div class="thumb" ${th}>${tid?'':'Önizleme için bir kez açın'}
         <div class="actions">
-          <button class="ico star ${S.defaultId===l.id?'on':''}" data-a="star" title="Açılışta bu liste devam etsin">${S.defaultId===l.id?'★':'☆'}</button>
+          <button class="ico star ${S.defaultId===l.id?'on':''}" data-a="star" title="Açılışta bu liste devam etsin">${ic(S.defaultId===l.id?'starf':'star')}</button>
           <span style="display:flex;gap:6px">
-            <button class="ico" data-a="ren" title="Yeniden adlandır">✎</button>
-            <button class="ico" data-a="del" title="Sil">🗑</button>
+            <button class="ico" data-a="ren" title="Yeniden adlandır">${ic('edit')}</button>
+            <button class="ico" data-a="del" title="Sil">${ic('trash')}</button>
           </span>
         </div>
         <span class="cnt">${pct}%</span>
@@ -453,9 +518,9 @@ function renderHome(){
         <div class="cstats">
           <div><span>İzlenen</span><b>${w} / ${t||'?'} video</b></div>
           <div><span>Sıra</span><b>${t?((l.index||0)+1)+' / '+t:'-'}</b></div>
-          <div class="w2"><span>Toplam izlenme süresi</span><b>⏱ ${fmt(l.watchSec)}</b></div>
+          <div class="w2"><span>Toplam izlenme süresi</span><b>${ic('clock',13)}${fmt(l.watchSec)}</b></div>
           <div class="td"><span>Bugün izlenen</span><b>${td.n} video</b></div>
-          <div class="td"><span>Bugün süre</span><b>⏱ ${fmt(td.sec)}</b></div>
+          <div class="td"><span>Bugün süre</span><b>${ic('clock',13)}${fmt(td.sec)}</b></div>
         </div>
         <div class="meta"><span>${ago(l.lastAt)}</span></div>
       </div></div>`}).join('');
@@ -686,7 +751,7 @@ $('items').addEventListener('click',e=>{
 function applyShape(){$('stage').classList.toggle('h',!!(cur&&cur.vertical===false))}
 async function doRefresh(){
   if(!cur)return;
-  if(!S.apiKey){showBanner("Listeyi yenilemek için Ayarlar'dan API anahtarı girin (ana ekran → ⚙ Ayarlar).");return}
+  if(!S.apiKey){showBanner("Listeyi yenilemek için Ayarlar'dan API anahtarı girin (ana ekran → Ayarlar).");return}
   try{showBanner('Liste yenileniyor…',true);await refreshIds(cur);showBanner('Liste güncellendi: '+cur.ids.length+' video.',true);setTimeout(hideBanner,2500)}
   catch(e){showBanner('API: '+e.message)}
 }
@@ -736,7 +801,7 @@ window.addEventListener('popstate',()=>{
 /* ---------- KAYDIRMA + TAM EKRAN ---------- */
 const stage=$('stage'),gest=$('gesture'),toastEl=$('toast');
 let toastT;
-function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
+function toast(t,i){toastEl.innerHTML=(i?ic(i):'')+(t?'<span>'+esc(t)+'</span>':'');toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
 function go(dir){
   if(!cur)return;
   // Kaydırarak geçişte videonun %70'inden fazlası izlendiyse izlenmiş say ve tikle
@@ -753,13 +818,13 @@ function go(dir){
     }catch(e){}
   }
   const ok=playIndex(ni);
-  toast(ok?((dir>0?'▲ ':'▼ ')+(cur.index+1)+' / '+cur.ids.length):(dir>0?'Son video':'İlk video'));
+  toast(ok?((cur.index+1)+' / '+cur.ids.length):(dir>0?'Son video':'İlk video'),ok?(dir>0?'up2':'down2'):null);
 }
 function togglePlay(){
   if(!playerReady)return;
   try{
-    if(player.getPlayerState()===1){player.pauseVideo();toast('⏸')}
-    else{player.playVideo();toast('▶')}
+    if(player.getPlayerState()===1){player.pauseVideo();toast('','pause')}
+    else{player.playVideo();toast('','play')}
   }catch(e){}
 }
 let g=null,lastTap=0,tapT=null,lpT=null;
@@ -788,7 +853,7 @@ gest.addEventListener('pointermove',e=>{
     let tg=g.t0+dx/(stage.clientWidth||300)*span;
     tg=Math.max(0,g.d>0?Math.min(tg,g.d-0.3):tg);
     g.tg=tg;
-    toast((tg>=g.t0?'⏩ ':'⏪ ')+fmtT(tg)+' / '+fmtT(g.d));
+    toast(fmtT(tg)+' / '+fmtT(g.d),tg>=g.t0?'fwd':'rew');
   }
 });
 gest.addEventListener('pointerup',e=>{
@@ -865,7 +930,7 @@ function seekBy(delta){
     const t=player.getCurrentTime(),d=player.getDuration();
     const n=Math.max(0,d>0?Math.min(t+delta,d-0.3):t+delta);
     player.seekTo(n,true);afterSeek();
-    toast((delta>0?'⏩ +':'⏪ −')+Math.abs(Math.round(delta))+' sn');
+    toast((delta>0?'+':'−')+Math.abs(Math.round(delta))+' sn',delta>0?'fwd':'rew');
   }catch(e){}
 }
 const seekEl=$('seek'),tCur=$('tCur'),tDur=$('tDur');
@@ -898,18 +963,18 @@ let autoMuted=false;
 function isMuted(){try{return !!player.isMuted()}catch(e){return false}}
 function updateMuteUI(){
   const m=isMuted(),b=$('btnMute');
-  b.textContent=m?'🔇':'🔊';b.classList.toggle('off',m);
+  const k=m?'mute':'vol';if(b.dataset.k!==k){b.dataset.k=k;b.innerHTML=ic(k)}b.classList.toggle('off',m);
   b.title=m?'Sesi aç':'Sesi kapat';
 }
 function setAutoMuted(v){autoMuted=v;updateMuteUI()}
 function doUnmute(){
   try{player.unMute();player.setVolume(100)}catch(e){}
-  autoMuted=false;updateMuteUI();toast('🔊');
+  autoMuted=false;updateMuteUI();toast('','vol');
 }
 function toggleMute(){
   if(!playerReady)return;
   if(isMuted())doUnmute();
-  else{try{player.mute()}catch(e){}autoMuted=false;updateMuteUI();toast('🔇')}
+  else{try{player.mute()}catch(e){}autoMuted=false;updateMuteUI();toast('','mute')}
 }
 $('btnMute').onclick=toggleMute;
 setInterval(()=>{if(playerReady&&cur)updateMuteUI()},1000);
@@ -936,7 +1001,7 @@ function setRate(r,quiet){
   S.rate=r;saveQuiet();
   try{if(playerReady)player.setPlaybackRate(r)}catch(e){}
   updSpeedUI();
-  if(!quiet)toast('⚡ '+fmtRate(r));
+  if(!quiet)toast(fmtRate(r),'bolt');
 }
 let lastRateTry=0;
 function applyRate(){
@@ -1108,7 +1173,7 @@ async function showDesc(){
     $('descCh').textContent=c?('Kanal: '+c):'';
     $('descTxt').textContent=d;
   };
-  if(!S.apiKey){paint(title,ch,"Açıklamayı görmek için ana ekrandaki ⚙ Ayarlar bölümüne YouTube API anahtarı girin.");return}
+  if(!S.apiKey){paint(title,ch,"Açıklamayı görmek için ana ekrandaki Ayarlar bölümüne YouTube API anahtarı girin.");return}
   if(descCache[vid]){const c=descCache[vid];paint(c.title||title,c.channel||ch,c.desc||'(Açıklama yok)');return}
   paint(title,ch,'Yükleniyor…');
   try{
@@ -1220,7 +1285,7 @@ function renderNoteForm(o){
     }else{
       if(txt)addNote(txt,o.time);
       closeNote(true);
-      toast(txt?'📝 Not kaydedildi':'Boş not kaydedilmedi');
+      toast(txt?'Not kaydedildi':'Boş not kaydedilmedi',txt?'note':null);
     }
   };
 }
@@ -1229,7 +1294,7 @@ function renderNoteList(focusId){
   const arr=notesOfVideo().sort((a,b)=>a.time-b.time);
   if(focusId){const i=arr.findIndex(n=>n.id===focusId);if(i>0)arr.unshift(arr.splice(i,1)[0])}
   noteBox.innerHTML='<div class="nh"><b>Notlar</b><span class="nt">'+arr.length+'</span></div>'+
-    (arr.length?'<div class="nlist">'+arr.map(n=>'<div class="ni'+(n.id===focusId?' hl':'')+'" data-id="'+n.id+'"><div class="nm"><span class="nt">'+fmtNT(n.time)+'</span><span class="na"><button data-a="edit" title="Düzenle">✎</button><button data-a="del" title="Sil">🗑</button></span></div><div class="ntx">'+esc(n.text)+'</div></div>').join('')+'</div>'
+    (arr.length?'<div class="nlist">'+arr.map(n=>'<div class="ni'+(n.id===focusId?' hl':'')+'" data-id="'+n.id+'"><div class="nm"><span class="nt">'+fmtNT(n.time)+'</span><span class="na"><button data-a="edit" title="Düzenle">'+ic('edit',16)+'</button><button data-a="del" title="Sil">'+ic('trash',16)+'</button></span></div><div class="ntx">'+esc(n.text)+'</div></div>').join('')+'</div>'
       :'<div class="ntx" style="color:var(--mut)">Bu videoda not yok.</div>')+
     '<div class="nrow"><button class="btn pri" id="noteClose">Kapat</button></div>';
   noteShow();
@@ -1245,7 +1310,7 @@ noteBox.addEventListener('click',e=>{
   if(b.dataset.a==='edit')renderNoteForm({id:n.id,time:n.time,text:n.text});
   else if(b.dataset.a==='del'){
     if(b.dataset.arm){S.notes=S.notes.filter(x=>x.id!==n.id);save();renderNoteList()}
-    else{b.dataset.arm='1';b.textContent='Sil?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='🗑'}},2500)}
+    else{b.dataset.arm='1';b.textContent='Sil?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.innerHTML=ic('trash',16)}},2500)}
   }
 });
 
