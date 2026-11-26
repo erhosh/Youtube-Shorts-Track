@@ -541,25 +541,6 @@ async function openList(id){
   }
   begin(l);
 }
-/* ---------- TANI (yalnızca adres sonuna #debug eklenince) ---------- */
-const DBG=/debug/.test(location.hash+location.search);let dbgEl=null,dbgLines=[];
-function dbg(m){
-  if(!DBG)return;
-  if(!dbgEl){dbgEl=document.createElement('pre');dbgEl.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99999;margin:0;padding:6px 8px;max-width:96vw;background:#000c;color:#7CFC00;font:11px/1.35 monospace;pointer-events:none;white-space:pre-wrap;border-radius:6px';document.body.appendChild(dbgEl)}
-  dbgLines.push(((Date.now()-lastLoad)/1000).toFixed(2)+'s '+m);
-  if(dbgLines.length>16)dbgLines.shift();
-  dbgEl.textContent=dbgLines.join('\n');
-}
-function dbgSample(){
-  if(!DBG)return;
-  const id=cur&&cur.vid;
-  for(let i=0;i<=16;i++)setTimeout(()=>{
-    if(!cur||cur.vid!==id)return;
-    let t=0,m='?',v='?',st='?';
-    try{t=player.getCurrentTime();m=player.isMuted();v=player.getVolume();st=player.getPlayerState()}catch(e){}
-    dbg('pos='+t.toFixed(2)+' muted='+m+' vol='+v+' st='+st);
-  },i*250);
-}
 function loadReset(){countedLoad=false;loadedOk=false;lastLoad=Date.now();suppressMark=null;resetFab()}
 function begin(l){
   if(l.startVid){const i=l.ids.indexOf(l.startVid);if(i>=0){l.index=i;l.vid=l.startVid;l.time=0}l.startVid=null}
@@ -580,8 +561,8 @@ function begin(l){
 function playIndex(i){
   if(!cur||!playerReady||i<0||i>=cur.ids.length)return false;
   cur.index=i;cur.vid=cur.ids[i];cur.time=0;cur.lastAt=Date.now();save();
-  loadReset();updateSwipe();seekFixFor=cur.vid;
-  try{player.loadVideoById({videoId:cur.vid,startSeconds:0})}catch(e){}
+  loadReset();updateSwipe();
+  try{player.loadVideoById({videoId:cur.vid})}catch(e){}
   highlight();
   return true;
 }
@@ -595,10 +576,8 @@ function onState(e){
   updateSwipe();
   if(!cur)return;
   const s=e.data;
-  dbg('state '+s);
   if(s===1){
     loadedOk=true;hideBanner();recordVideo();
-    kickAudio();if(DBG&&dbgFor!==cur.vid){dbgFor=cur.vid;dbgSample()}
     if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
     else if(!cur.cc)enforceCCOff();
   }
@@ -607,18 +586,6 @@ function onState(e){
     if(!playIndex(cur.index+1)){cur.time=0;save()}
   }
   else if(s===2)saveProgress();
-}
-// Kaydırarak açılan videoda (loadVideoById) YouTube ses hattı ilk ~2 sn gecikmeli başlıyor; aynı video
-// başa sarılınca ses sorunsuz. Bu yüzden ilk oynatmada hemen başa (0 sn) bir kez sarıyoruz.
-let seekFixFor=null,dbgFor=null;
-function kickAudio(){
-  if(!cur||seekFixFor!==cur.vid)return;
-  seekFixFor=null;
-  try{
-    const t=player.getCurrentTime();
-    dbg('seekFix pos='+t.toFixed(2));
-    if(t<2){player.seekTo(0,true);afterSeek()}
-  }catch(e){}
 }
 function curVid(){try{const d=player.getVideoData();return d&&d.video_id}catch(e){return null}}
 function recordVideo(){
@@ -908,7 +875,6 @@ setInterval(()=>{if(playerReady&&cur)updateMuteUI()},1000);
 function ensureAutoplay(l){
   setTimeout(()=>{
     if(cur!==l||loadedOk||!playerReady)return;
-    dbg('AUTOPLAY-FALLBACK mute()');
     try{player.mute();player.playVideo();setAutoMuted(true)}catch(e){}
   },1500);
 }
@@ -937,12 +903,7 @@ function countWatch(){
 
 /* ---------- ALTYAZI (CC) ---------- */
 // Sarma/arabellek sonrasında YouTube altyazıyı kendiliğinden açabiliyor; kapalıysa tekrar kapat
-// Yalnızca ekranda gerçekten bir altyazı parçası etkinse kapat. Her videoda ilk saniyelerde koşulsuz
-// unloadModule çağırmak, oynatıcının ses hattı başlarken kesinti (ilk 3-4 sn sessizlik) yapabiliyordu.
-function ccTrackActive(){
-  try{const t=player.getOption('captions','track');return !!(t&&t.languageCode)}catch(e){return false}
-}
-function enforceCCOff(){try{const a=ccTrackActive();dbg('enforceCCOff active='+a);if(a)player.unloadModule('captions')}catch(e){}}
+function enforceCCOff(){try{player.unloadModule('captions')}catch(e){}}
 function afterSeek(){
   if(cur&&!cur.cc)[250,900,2200].forEach(ms=>setTimeout(()=>{if(cur&&!cur.cc)enforceCCOff()},ms));
 }
@@ -952,7 +913,6 @@ function updateCCUI(){
 }
 function applyCC(userAction){
   if(!playerReady)return;
-  dbg('applyCC cc='+(cur&&cur.cc));
   try{
     if((cur&&cur.cc)){
       player.loadModule('captions');
@@ -966,8 +926,7 @@ function applyCC(userAction){
         }catch(e){}
       },700);
     }else{
-      if(!userAction)enforceCCOff();   // otomatik çağrıda koşulsuz kapatma yok
-      else player.unloadModule('captions');
+      player.unloadModule('captions');
     }
   }catch(e){}
 }
