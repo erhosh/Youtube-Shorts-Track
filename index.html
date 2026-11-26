@@ -164,9 +164,11 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 #notesList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 #btnSpeed.on{background:var(--star);border-color:var(--star);color:#1a1300}
 .ctrl{gap:8px}
-#speedStrip{display:none;position:absolute;left:36px;right:36px;bottom:40px;height:40px;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:center;border-radius:20px;background:#2a2f3a;border:1px solid #4a5163;color:#e8eaf0;font-size:13px;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
+#speedStrip{display:none;position:absolute;left:36px;right:36px;bottom:36px;height:48px;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:space-between;padding:0 14px;border-radius:24px;background:rgba(42,47,58,.35);border:1px solid rgba(139,147,165,.25);color:rgba(232,234,240,.45);font-size:13px;-webkit-tap-highlight-color:transparent}
 .stage:fullscreen #speedStrip,.stage.fs #speedStrip{display:flex}
-#speedStrip.act{background:#3d4557;border-color:var(--ok);color:#fff}
+#speedStrip.act{background:rgba(42,47,58,.55);border-color:rgba(62,207,142,.5)}
+#speedKnob{position:absolute;left:50%;top:50%;width:42px;height:42px;border-radius:50%;background:rgba(232,234,240,.2);border:1.5px solid rgba(232,234,240,.55);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;transform:translate(calc(-50% + var(--kx,0px)),-50%) scale(var(--ks,1));transition:transform .7s cubic-bezier(.3,1.9,.45,1),background .2s,border-color .2s}
+#speedStrip.act #speedKnob{transition:none;background:rgba(62,207,142,.35);border-color:var(--ok)}
 </style>
 </head>
 <body>
@@ -197,7 +199,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip">◀ hız ▶</div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip"><span>◀</span><span id="speedKnob">1×</span><span>▶</span></div></div>
   <div class="seekrow">
     <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
     <span class="tm" id="tCur">0:00</span>
@@ -917,7 +919,7 @@ function rateIdx(a,r){let bi=0,bd=99;a.forEach((x,i)=>{const d=Math.abs(x-r);if(
 function fmtRate(r){return(Math.round(r*100)/100)+'×'}
 function updSpeedUI(){
   const a=ratesList(),r=S.rate||1;
-  $('spBtnTx').textContent=fmtRate(r);
+  $('spBtnTx').textContent=fmtRate(r);$('speedKnob').textContent=fmtRate(r);
   $('btnSpeed').classList.toggle('on',r!==1);
   const rg=$('spRange');rg.max=a.length-1;rg.value=rateIdx(a,r);
   $('spLbl').textContent=fmtRate(r);
@@ -933,22 +935,32 @@ function applyRate(){try{if(S.rate&&player.getPlaybackRate()!==S.rate)player.set
 $('btnSpeed').onclick=()=>{const p=$('speedPanel');p.style.display=p.style.display==='none'?'flex':'none';updSpeedUI()};
 $('spRange').addEventListener('input',e=>{const a=ratesList();setRate(a[+e.target.value],true)});
 $('spReset').onclick=()=>setRate(1);
-// Tam ekranda: alt kenardan ~64 px yukarıdaki şeridi sağa/sola kaydırarak hız ayarı
-// (sistem gezinme jesti alt kenarda, geri jesti yan kenarlarda olduğundan şerit her iki kenardan içeride tutuldu)
-const strip=$('speedStrip');let sg=null;
+// Tam ekranda: yuvarlak düğmeyi sağa/sola sürükleyerek hız ayarı; bırakınca yay gibi ortaya geri döner
+// (şerit alt kenardan 36 px yukarıda, yan kenarlardan 36 px içeride: sistem jestleri tetiklenmez)
+const strip=$('speedStrip'),knob=$('speedKnob');let sg=null;
+function kx(dx){
+  const max=Math.max(30,strip.clientWidth/2-30);
+  return max*Math.tanh(dx/max*0.9); // sınıra yaklaştıkça direnç (lastik etkisi)
+}
 strip.addEventListener('pointerdown',e=>{
   sg={x:e.clientX,i:rateIdx(ratesList(),S.rate||1)};
-  strip.classList.add('act');
+  strip.classList.add('act');knob.style.setProperty('--ks','1.15');
   try{strip.setPointerCapture(e.pointerId)}catch(x){}
   e.preventDefault();
 });
 strip.addEventListener('pointermove',e=>{
   if(!sg)return;
-  const a=ratesList();
-  const i=Math.max(0,Math.min(a.length-1,sg.i+Math.round((e.clientX-sg.x)/36)));
+  const dx=e.clientX-sg.x,a=ratesList();
+  knob.style.setProperty('--kx',kx(dx)+'px');
+  const i=Math.max(0,Math.min(a.length-1,sg.i+Math.round(dx/36)));
   if(a[i]!==(S.rate||1))setRate(a[i]);
 });
-const endSg=()=>{sg=null;strip.classList.remove('act')};
+const endSg=()=>{
+  if(!sg)return;sg=null;
+  strip.classList.remove('act');
+  // sınıf kalkınca geçiş (yaylı geri dönüş) devreye girer
+  knob.style.setProperty('--kx','0px');knob.style.setProperty('--ks','1');
+};
 strip.addEventListener('pointerup',endSg);strip.addEventListener('pointercancel',endSg);
 
 /* ---------- GÜNLÜK SAYAÇ ---------- */
