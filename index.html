@@ -541,6 +541,25 @@ async function openList(id){
   }
   begin(l);
 }
+/* ---------- TANI (yalnızca adres sonuna #debug eklenince) ---------- */
+const DBG=/debug/.test(location.hash+location.search);let dbgEl=null,dbgLines=[];
+function dbg(m){
+  if(!DBG)return;
+  if(!dbgEl){dbgEl=document.createElement('pre');dbgEl.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99999;margin:0;padding:6px 8px;max-width:96vw;background:#000c;color:#7CFC00;font:11px/1.35 monospace;pointer-events:none;white-space:pre-wrap;border-radius:6px';document.body.appendChild(dbgEl)}
+  dbgLines.push(((Date.now()-lastLoad)/1000).toFixed(2)+'s '+m);
+  if(dbgLines.length>16)dbgLines.shift();
+  dbgEl.textContent=dbgLines.join('\n');
+}
+function dbgSample(){
+  if(!DBG)return;
+  const id=cur&&cur.vid;
+  for(let i=0;i<=16;i++)setTimeout(()=>{
+    if(!cur||cur.vid!==id)return;
+    let t=0,m='?',v='?',st='?';
+    try{t=player.getCurrentTime();m=player.isMuted();v=player.getVolume();st=player.getPlayerState()}catch(e){}
+    dbg('pos='+t.toFixed(2)+' muted='+m+' vol='+v+' st='+st);
+  },i*250);
+}
 function loadReset(){countedLoad=false;loadedOk=false;lastLoad=Date.now();suppressMark=null;resetFab()}
 function begin(l){
   if(l.startVid){const i=l.ids.indexOf(l.startVid);if(i>=0){l.index=i;l.vid=l.startVid;l.time=0}l.startVid=null}
@@ -576,9 +595,10 @@ function onState(e){
   updateSwipe();
   if(!cur)return;
   const s=e.data;
+  dbg('state '+s);
   if(s===1){
     loadedOk=true;hideBanner();recordVideo();
-    kickAudio();
+    kickAudio();if(DBG&&dbgFor!==cur.vid){dbgFor=cur.vid;dbgSample()}
     if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
     else if(!cur.cc)enforceCCOff();
   }
@@ -590,7 +610,7 @@ function onState(e){
 }
 // Her videonun ilk oynatılışında ses hattını hemen canlandır: oynatıcı "sesi açık" gösterip
 // ilk ~2 sn sessiz kalabiliyor. Kullanıcı sesi kapattıysa (🔇) ya da otomatik sessiz başladıysa dokunulmaz.
-let kickFor=null;
+let kickFor=null,dbgFor=null;
 function kickAudio(){
   if(!cur||kickFor===cur.vid)return;
   kickFor=cur.vid;
@@ -889,6 +909,7 @@ setInterval(()=>{if(playerReady&&cur)updateMuteUI()},1000);
 function ensureAutoplay(l){
   setTimeout(()=>{
     if(cur!==l||loadedOk||!playerReady)return;
+    dbg('AUTOPLAY-FALLBACK mute()');
     try{player.mute();player.playVideo();setAutoMuted(true)}catch(e){}
   },1500);
 }
@@ -922,7 +943,7 @@ function countWatch(){
 function ccTrackActive(){
   try{const t=player.getOption('captions','track');return !!(t&&t.languageCode)}catch(e){return false}
 }
-function enforceCCOff(){try{if(ccTrackActive())player.unloadModule('captions')}catch(e){}}
+function enforceCCOff(){try{const a=ccTrackActive();dbg('enforceCCOff active='+a);if(a)player.unloadModule('captions')}catch(e){}}
 function afterSeek(){
   if(cur&&!cur.cc)[250,900,2200].forEach(ms=>setTimeout(()=>{if(cur&&!cur.cc)enforceCCOff()},ms));
 }
@@ -932,6 +953,7 @@ function updateCCUI(){
 }
 function applyCC(userAction){
   if(!playerReady)return;
+  dbg('applyCC cc='+(cur&&cur.cc));
   try{
     if((cur&&cur.cc)){
       player.loadModule('captions');
