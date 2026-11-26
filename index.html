@@ -262,6 +262,11 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   <p id="dirInfo"></p>
   <div class="sep">
     <h4>Cihazlar Arası Senkronizasyon (Firebase)</h4>
+    <div id="syncLogin" class="row" style="align-items:center;gap:8px;flex-wrap:wrap">
+      <span id="gUserLine" style="flex:1;min-width:0;font-size:13px"></span>
+      <button class="btn pri" id="btnGLogin">Google ile giriş yap</button>
+      <button class="btn" id="btnGLogout" style="display:none">Çıkış</button>
+    </div>
     <div id="syncOff">
       <div class="row"><button class="btn pri" id="btnSyncCreate">Yeni kod oluştur</button></div>
       <label for="syncCodeIn">veya başka cihazdaki 6 karakterli kodu girin</label>
@@ -1297,7 +1302,9 @@ function homeNote(t){const n=$('syncNote');n.textContent=t;n.style.display='bloc
 function withTimeout(p,ms,msg){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg||'Zaman aşımı (internet yok mu?)')),ms))])}
 function errMsg(e){
   const m=String((e&&e.message)||e||'');const c=(e&&e.code)||'';
-  if(/PERMISSION_DENIED/i.test(m))return 'Erişim reddedildi: Firebase → Realtime Database → Rules ayarlarını ve Anonymous girişi kontrol edin.';
+  if(m==='LOGIN_REQUIRED')return 'Önce Google ile giriş yapın.';
+  if(c.indexOf('auth/')===0)return gErrText(e);
+  if(/PERMISSION_DENIED/i.test(m))return 'Erişim reddedildi: Google ile giriş yaptığınızdan ve Realtime Database kurallarının users/$uid yapısına izin verdiğinden emin olun.';
   if(/operation-not-allowed|admin-restricted/i.test(c+m))return 'Anonim giriş kapalı: Firebase → Authentication → Sign-in method → Anonymous seçeneğini açın.';
   return 'Hata: '+m;
 }
@@ -1318,20 +1325,50 @@ async function loadFirebaseSdk(){
   }
 }
 function fbReady(){
-  if(fbP)return fbP;
-  fbP=(async()=>{
-    if(String(FB_CONFIG.apiKey).indexOf('BURAYA')===0)throw new Error('Firebase ayarları girilmemiş: index.html içindeki FB_CONFIG alanını doldurun.');
-    await loadFirebaseSdk();
-    if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);
-    const auth=firebase.auth();
-    const u=await new Promise(r=>{const off=auth.onAuthStateChanged(x=>{off();r(x)})});
-    if(!u)await auth.signInAnonymously();
-  })();
-  fbP.catch(()=>{fbP=null});
-  return fbP;
+  if(!fbP){
+    fbP=(async()=>{
+      if(String(FB_CONFIG.apiKey).indexOf('BURAYA')===0)throw new Error('Firebase ayarları girilmemiş: index.html içindeki FB_CONFIG alanını doldurun.');
+      await loadFirebaseSdk();
+      if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);
+      const auth=firebase.auth();
+      await new Promise(r=>{let first=true;auth.onAuthStateChanged(u=>{onGAuth(u);if(first){first=false;r()}})});
+    })();
+    fbP.catch(()=>{fbP=null});
+  }
+  return fbP.then(()=>{
+    const u=firebase.auth().currentUser;
+    if(!u||u.isAnonymous)throw new Error('LOGIN_REQUIRED');
+    return u;
+  });
+}
+function fbPath(code){return 'users/'+firebase.auth().currentUser.uid+'/'+SYNC_ROOT+'/'+code}
+function onGAuth(u){
+  const ok=!!(u&&!u.isAnonymous);
+  const l=$('gUserLine');if(l)l.textContent=ok?('Giriş: '+(u.email||u.displayName||'Google hesabı')):'Senkron için Google ile giriş yapın.';
+  const a=$('btnGLogin'),b=$('btnGLogout');if(a)a.style.display=ok?'none':'';if(b)b.style.display=ok?'':'none';
+  if(!ok){stopListener()}
+  refreshSyncUI();
+}
+function gErrText(e){
+  const c=(e&&e.code)||'',m=String((e&&e.message)||e||'');
+  if(c==='auth/unauthorized-domain')return 'Bu adres Firebase yetkili alan adlarında yok: Firebase → Authentication → Settings → Authorized domains bölümüne ekleyin.';
+  if(c==='auth/operation-not-allowed')return 'Google girişi kapalı: Firebase → Authentication → Sign-in method → Google açın.';
+  if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')return 'Giriş penceresi kapatıldı.';
+  if(c==='auth/network-request-failed')return 'Ağ hatası (Google servislerine erişilemiyor olabilir).';
+  return 'Giriş hatası: '+m;
+}
+async function gSignIn(){
+  const auth=firebase.auth();
+  const p=new firebase.auth.GoogleAuthProvider();
+  p.setCustomParameters({prompt:'select_account'});
+  try{await auth.signInWithPopup(p)}
+  catch(e){
+    if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(e.code)){await auth.signInWithRedirect(p)}
+    else throw e;
+  }
 }
 async function cloudGet(code){
-  const snap=await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+code).once('value'),12000);
+  const snap=await withTimeout(firebase.database().ref(fbPath(code)).once('value'),12000);
   return snap.val();
 }
 function payload(){return JSON.stringify({lists:S.lists,defaultId:S.defaultId,notes:S.notes})}
@@ -1339,7 +1376,7 @@ async function doPush(){
   pushing=true;
   try{
     const ts=Date.now();
-    await withTimeout(firebase.database().ref(SYNC_ROOT+'/'+SY.code).set({data:payload(),updatedAt:ts,device:SY.dev}),15000);
+    await withTimeout(firebase.database().ref(fbPath(SY.code)).set({data:payload(),updatedAt:ts,device:SY.dev}),15000);
     SY.lastAt=ts;SY.dirty=false;saveSync();
     return ts;
   }finally{pushing=false}
@@ -1392,7 +1429,7 @@ async function autoPush(){
 function startListener(){
   stopListener();
   if(!SY.code||!SY.auto)return;
-  const ref=firebase.database().ref(SYNC_ROOT+'/'+SY.code);
+  const ref=firebase.database().ref(fbPath(SY.code));
   const cb=snap=>onRemote(snap.val());
   ref.on('value',cb,err=>setSyncStatus(errMsg(err)));
   fbListening={ref,cb};
@@ -1401,7 +1438,9 @@ function stopListener(){if(fbListening){try{fbListening.ref.off('value',fbListen
 
 function refreshSyncUI(){
   const on=!!SY.code;
-  $('syncOff').style.display=on?'none':'block';
+  const gu=(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.auth().currentUser);
+  const li=!!(gu&&!gu.isAnonymous);
+  $('syncOff').style.display=(!on&&li)?'block':'none';
   $('syncOn').style.display=on?'block':'none';
   $('syncCodeShow').textContent=SY.code||'';
   $('btnSyncAuto').textContent='Otomatik senkron: '+(SY.auto?'Açık':'Kapalı');
@@ -1413,6 +1452,15 @@ async function busy(btn,fn){
   try{await fn()}catch(e){setSyncStatus(errMsg(e))}
   finally{btn.disabled=false}
 }
+$('btnGLogin').onclick=()=>busy($('btnGLogin'),async()=>{
+  try{await fbReady()}catch(e){if(e.message!=='LOGIN_REQUIRED')throw e}
+  try{await gSignIn()}catch(e){setSyncStatus(gErrText(e))}
+});
+$('btnGLogout').onclick=async()=>{
+  if(!confirm('Google oturumu kapatılsın mı? Senkron durur, cihazdaki veriler silinmez.'))return;
+  stopListener();
+  try{await firebase.auth().signOut()}catch(e){}
+};
 $('btnSyncCreate').onclick=()=>busy($('btnSyncCreate'),async()=>{
   setSyncStatus('Bağlanıyor…');
   await fbReady();
@@ -1480,6 +1528,7 @@ async function boot(){
   const dl0=S.defaultId&&S.lists.find(l=>l.id===S.defaultId);
   if(dl0)bootShell(dl0);else{document.documentElement.classList.remove('bp');renderHome()}
   // Otomatik senkron açıksa buluttaki en yeni veriyi kısa süre (en fazla 1,5 sn) bekle; oynatıcı bu sırada yükleniyor
+  fbReady().catch(()=>{});
   if(SY.code&&SY.auto){
     try{
       await withTimeout((async()=>{
