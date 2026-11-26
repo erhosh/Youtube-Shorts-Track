@@ -162,6 +162,11 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 #undoBar.show{display:flex}
 #undoBar .btn{padding:6px 12px;background:var(--ok);border-color:var(--ok);color:#06220f;font-weight:600;flex:none}
 #notesList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+#btnSpeed.on{background:var(--star);border-color:var(--star);color:#1a1300}
+.ctrl{gap:8px}
+#speedStrip{display:none;position:absolute;left:36px;right:36px;bottom:64px;height:44px;z-index:6;touch-action:none;user-select:none;-webkit-user-select:none;align-items:center;justify-content:center;border-radius:22px;background:#0003;color:#fff9;font-size:12px;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
+.stage:fullscreen #speedStrip,.stage.fs #speedStrip{display:flex}
+#speedStrip.act{background:#000a;color:#fff}
 </style>
 </head>
 <body>
@@ -192,7 +197,7 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
 
 <!-- OYNATICI EKRANI -->
 <div id="view-player">
-  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div></div>
+  <div class="stage" id="stage"><div id="player"></div><div id="gesture"></div><button id="cleanExit" title="Arayüzü geri getir">✕</button><div id="toast"></div><div id="dayPop"></div><button id="noteFab" title="Notu göster">📝</button><div id="noteOv"><div id="noteBox"></div></div><div id="speedStrip">◀ hız ▶</div></div>
   <div class="seekrow">
     <button class="btn" id="btnSeekB" title="10 sn geri">⏪ 10</button>
     <span class="tm" id="tCur">0:00</span>
@@ -204,10 +209,16 @@ dialog .sep h4{margin:12px 0 2px;font-size:15px}
   <div class="ctrl">
     <button class="btn" id="btnNoteNotify" title="Not bildirimleri: kayıtlı not saniyesinde simge göster">🔔</button>
     <button class="btn" id="btnCC" title="Altyazı aç/kapat"><span class="cc">CC</span></button>
+    <button class="btn" id="btnSpeed" title="Oynatma hızı"><span id="spBtnTx" style="font-size:15px;font-weight:700">1×</span></button>
     <button class="btn" id="btnMute" title="Sesi aç/kapat">🔊</button>
     <button class="btn" id="btnFs" title="Tam ekran">⛶</button>
     <button class="btn" id="btnHome" title="Ana ekran">🏠</button>
     <button class="btn" id="btnMore" title="Seçenekler">⋮</button>
+  </div>
+  <div class="seekrow" id="speedPanel" style="display:none">
+    <span class="tm" id="spLbl">1×</span>
+    <input type="range" id="spRange" min="0" max="7" value="3" step="1" aria-label="Oynatma hızı">
+    <button class="btn" id="spReset" title="Hızı 1× yap">1×</button>
   </div>
   <div class="listhead"><span>Videolar</span><button class="btn" id="btnResetWatched">☑ Tüm izlenenleri sıfırla</button></div>
   <div class="items" id="items"></div>
@@ -313,7 +324,7 @@ function loadSync(){
 function saveSync(){try{localStorage.setItem(LSS,JSON.stringify(SY))}catch(e){}}
 function migrate(s){
   if(!s||!Array.isArray(s.lists))s={lists:[],defaultId:null,apiKey:''};
-  s.ccOn=!!s.ccOn;s.noteNotify=!!s.noteNotify;
+  s.ccOn=!!s.ccOn;s.noteNotify=!!s.noteNotify;s.rate=(typeof s.rate==='number'&&s.rate>0)?s.rate:1;
   s.notes=(Array.isArray(s.notes)?s.notes:[]).filter(n=>n&&n.id&&n.videoId&&typeof n.time==='number'&&n.text);
   s.lists.forEach(l=>{
     l.ids=l.ids||[];l.titles=l.titles||{};l.watched=l.watched||{};l.liked=l.liked||{};
@@ -495,8 +506,9 @@ function ensurePlayer(){
       const pv={playsinline:1,autoplay:1,rel:0,fs:0,cc_load_policy:ccHint?1:0};
       if(location.protocol.indexOf('http')===0)pv.origin=location.origin;
       player=new YT.Player('player',{width:'100%',height:'100%',playerVars:pv,events:{
-        onReady:()=>{playerReady=true;res()},
+        onReady:()=>{playerReady=true;updSpeedUI();res()},
         onStateChange:onState,
+        onPlaybackRateChange:()=>{if(cur&&playerReady)applyRate()},
         onError:onErr}});
     };
     if(YTready)mk();else onApi.push(mk);
@@ -581,8 +593,9 @@ function onState(e){
   updateSwipe();
   if(!cur)return;
   const s=e.data;
+  if(s===3)applyRate();
   if(s===1){
-    loadedOk=true;hideBanner();recordVideo();
+    loadedOk=true;hideBanner();recordVideo();applyRate();
     if(ccFor!==cur.vid){ccFor=cur.vid;applyCC(false)}
     else if(!cur.cc)enforceCCOff();
   }
@@ -719,7 +732,20 @@ let toastT;
 function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),900)}
 function go(dir){
   if(!cur)return;
-  const ok=playIndex(cur.index+dir);
+  // Kaydırarak geçişte videonun %70'inden fazlası izlendiyse izlenmiş say ve tikle
+  const ni=cur.index+dir,pv=cur.vid;
+  if(pv&&ni>=0&&ni<cur.ids.length){
+    try{
+      if(curVid()===pv){
+        const d=player.getDuration(),t=player.getCurrentTime();
+        if(d>0&&t/d>0.7){
+          if(suppressMark!==pv&&!cur.watched[pv])markWatched(pv,true);
+          countWatch();
+        }
+      }
+    }catch(e){}
+  }
+  const ok=playIndex(ni);
   toast(ok?((dir>0?'▲ ':'▼ ')+(cur.index+1)+' / '+cur.ids.length):(dir>0?'Son video':'İlk video'));
 }
 function togglePlay(){
@@ -883,6 +909,47 @@ function ensureAutoplay(l){
     try{player.mute();player.playVideo();setAutoMuted(true)}catch(e){}
   },1500);
 }
+
+/* ---------- OYNATMA HIZI ---------- */
+const DEF_RATES=[0.25,0.5,0.75,1,1.25,1.5,1.75,2];
+function ratesList(){let a=null;try{a=player.getAvailablePlaybackRates()}catch(e){}return(a&&a.length)?a:DEF_RATES}
+function rateIdx(a,r){let bi=0,bd=99;a.forEach((x,i)=>{const d=Math.abs(x-r);if(d<bd){bd=d;bi=i}});return bi}
+function fmtRate(r){return(Math.round(r*100)/100)+'×'}
+function updSpeedUI(){
+  const a=ratesList(),r=S.rate||1;
+  $('spBtnTx').textContent=fmtRate(r);
+  $('btnSpeed').classList.toggle('on',r!==1);
+  const rg=$('spRange');rg.max=a.length-1;rg.value=rateIdx(a,r);
+  $('spLbl').textContent=fmtRate(r);
+}
+function setRate(r,quiet){
+  const a=ratesList();r=a[rateIdx(a,r)];
+  S.rate=r;saveQuiet();
+  try{if(playerReady)player.setPlaybackRate(r)}catch(e){}
+  updSpeedUI();
+  if(!quiet)toast('⚡ '+fmtRate(r));
+}
+function applyRate(){try{if(S.rate&&player.getPlaybackRate()!==S.rate)player.setPlaybackRate(S.rate)}catch(e){}}
+$('btnSpeed').onclick=()=>{const p=$('speedPanel');p.style.display=p.style.display==='none'?'flex':'none';updSpeedUI()};
+$('spRange').addEventListener('input',e=>{const a=ratesList();setRate(a[+e.target.value],true)});
+$('spReset').onclick=()=>setRate(1);
+// Tam ekranda: alt kenardan ~64 px yukarıdaki şeridi sağa/sola kaydırarak hız ayarı
+// (sistem gezinme jesti alt kenarda, geri jesti yan kenarlarda olduğundan şerit her iki kenardan içeride tutuldu)
+const strip=$('speedStrip');let sg=null;
+strip.addEventListener('pointerdown',e=>{
+  sg={x:e.clientX,i:rateIdx(ratesList(),S.rate||1)};
+  strip.classList.add('act');
+  try{strip.setPointerCapture(e.pointerId)}catch(x){}
+  e.preventDefault();
+});
+strip.addEventListener('pointermove',e=>{
+  if(!sg)return;
+  const a=ratesList();
+  const i=Math.max(0,Math.min(a.length-1,sg.i+Math.round((e.clientX-sg.x)/36)));
+  if(a[i]!==(S.rate||1))setRate(a[i]);
+});
+const endSg=()=>{sg=null;strip.classList.remove('act')};
+strip.addEventListener('pointerup',endSg);strip.addEventListener('pointercancel',endSg);
 
 /* ---------- GÜNLÜK SAYAÇ ---------- */
 let countedLoad=false,popT;
@@ -1386,8 +1453,8 @@ function applyRemote(v){
   if(!inc||!Array.isArray(inc.lists)){setSyncStatus('Bulut verisi geçersiz.');return false}
   applying=true;
   try{
-    const key=S.apiKey,nn=S.noteNotify,oldNotes=S.notes;
-    S=migrate(inc);S.apiKey=key;S.noteNotify=nn;
+    const key=S.apiKey,nn=S.noteNotify,rt=S.rate,oldNotes=S.notes;
+    S=migrate(inc);S.apiKey=key;S.noteNotify=nn;S.rate=rt;
     if(!Array.isArray(inc.notes))S.notes=oldNotes; // eski sürümden gelen veri yerel notları silmesin
     try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
     SY.lastAt=v.updatedAt;SY.dirty=false;saveSync();
@@ -1524,7 +1591,7 @@ function bootShell(l){
   ensurePlayer();
 }
 async function boot(){
-  updateCCUI();updNoteUI();
+  updateCCUI();updNoteUI();updSpeedUI();
   const dl0=S.defaultId&&S.lists.find(l=>l.id===S.defaultId);
   if(dl0)bootShell(dl0);else{document.documentElement.classList.remove('bp');renderHome()}
   // Otomatik senkron açıksa buluttaki en yeni veriyi kısa süre (en fazla 1,5 sn) bekle; oynatıcı bu sırada yükleniyor
